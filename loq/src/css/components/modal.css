@@ -1,0 +1,110 @@
+:root {
+  --modal-content-background-color: #1c1c1c;
+  --modal-background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal {
+  position: fixed;
+  z-index: 20;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: var(--modal-background-color);
+  font-size: initial;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.modal>div {
+  max-width: min(80%, 480px);
+}
+
+.modal>div.size-1 {
+  max-width: min(90%, 960px);
+}
+
+.modal-body {
+  background-color: var(--modal-content-background-color);
+  width: 500px;
+  height: 300px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  animation: modal-appear 250ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation-iteration-count: 1;
+  margin: 30px;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: clip;
+  border: none;
+}
+
+.modal-head-content {
+  /* font-family: "Montserrat"; */
+  font-size: 20pt;
+  flex: 1 0;
+  text-align: center;
+  color: var(--text-on-gradient-color);
+}
+
+.modal-head-close {
+  margin-right: 5px;
+  margin-left: -60px;
+  margin-top: -15px;
+  margin-bottom: -15px;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background-color: transparent;
+}
+
+.modal-head-close>img {
+  margin: 15px;
+  vertical-align: middle;
+  filter: var(--accent-icon-filter);
+}
+
+.modal-head {
+  flex: 0 0 75px;
+  background: linear-gradient(135deg,
+      var(--color-accent-0) 0%,
+      var(--color-accent-1) 100%);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  margin: -1px;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+}
+
+@keyframes modal-appear {
+  from {
+    transform: scale(80%);
+  }
+
+  to {
+    transform: scale(100%);
+  }
+}
+
+.modal-content {
+  flex: 1 0 0;
+  font-size: 16pt;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  min-height: auto;
+  background-color: var(--modal-content-background-color);
+  margin: 0 auto;
+  border: 1px solid var(--modal-border-color);
+  width: calc(100% - 40px);
+}
