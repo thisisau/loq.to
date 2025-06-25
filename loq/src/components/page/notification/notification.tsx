@@ -48,6 +48,7 @@ export default function Notification(props: {
   };
 
   const resetTimer = () => {
+    if (props.time === undefined) return;
     clearTimer();
     const timeout = setTimeout(() => {
       if (activeTimeout.current !== timeout) return;

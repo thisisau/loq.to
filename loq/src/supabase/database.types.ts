@@ -61,42 +61,42 @@ export type Database = {
           contents: Json | null
           copy_protect: boolean
           created_at: string
-          description: string
           id: number
           interactions: number
           last_updated: string
           last_used: string
           likes: number
+          quiz_description: string
           title: string
-          visibility: number
+          visibility: Database["public"]["Enums"]["visibility"] | null
         }
         Insert: {
           author?: string | null
           contents?: Json | null
           copy_protect?: boolean
           created_at?: string
-          description?: string
           id?: number
           interactions?: number
           last_updated?: string
           last_used?: string
           likes?: number
+          quiz_description?: string
           title?: string
-          visibility?: number
+          visibility?: Database["public"]["Enums"]["visibility"] | null
         }
         Update: {
           author?: string | null
           contents?: Json | null
           copy_protect?: boolean
           created_at?: string
-          description?: string
           id?: number
           interactions?: number
           last_updated?: string
           last_used?: string
           likes?: number
+          quiz_description?: string
           title?: string
-          visibility?: number
+          visibility?: Database["public"]["Enums"]["visibility"] | null
         }
         Relationships: [
           {
@@ -125,6 +125,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      upload_loq: {
+        Args: {
+          loq_id: number
+          loq_contents: Json
+        }
+        Returns: number
+      }
       username_exists: {
         Args: {
           username_new: string
@@ -139,7 +146,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      visibility: "public" | "unlisted" | "private"
     }
     CompositeTypes: {
       [_ in never]: never

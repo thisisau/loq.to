@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Contents,
   Image,
@@ -16,6 +16,7 @@ import {
   TextImageAnswerContent,
   TrueFalseAnswer,
   Video,
+  Visibility,
 } from "./editor.types";
 
 import Loader from "../../components/load";
@@ -41,6 +42,8 @@ import Button from "../../components/input/button";
 import { useAddNotification } from "../../components/page/notification/hooks";
 import Notification from "../../components/page/notification/notification";
 import { AnimatePresence, motion } from "motion/react";
+import supabase from "../../supabase/client";
+import { useUserInfo } from "../../functions/userInfo";
 
 const questionTypes: Array<{ type: QuestionType; display: string }> = [
   {
@@ -223,6 +226,13 @@ function EditorSidebar() {
   const [quiz, updateQuiz] = useLOQ();
   const [page, setPage] = useActivePage();
 
+  const user = useUserInfo();
+
+  const addNotification = useAddNotification();
+
+  const params = useParams();
+  const navigate = useNavigate();
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -255,6 +265,47 @@ function EditorSidebar() {
             "save-button nav-button",
             page.unsavedChanges && "attention-needed"
           )}
+          onClick={async () => {
+            if (user.id === "") {
+              addNotification(
+                <Notification title="Error">
+                  You must be logged in to perform this action.
+                </Notification>
+              );
+              return;
+            }
+            const id = isNaN(Number(params.id)) ? -1 : Number(params.id);
+            addNotification(
+              <Notification title="Uploading..." time={4000}>
+                Saving your loq...
+              </Notification>
+            );
+
+            const { data, error } = await supabase.rpc("upload_loq", {
+              loq_id: id,
+              loq_contents: quiz,
+            });
+            if (error) {
+              addNotification(
+                <Notification title="Error">
+                  An error occured: {error.message}
+                </Notification>
+              );
+              return;
+            }
+            addNotification(
+              <Notification title="Success!" time={4000}>
+                Your loq has been saved.
+              </Notification>
+            );
+            setPage({
+              ...page,
+              unsavedChanges: false
+            })
+            if (data && data !== id) {
+              navigate(`/editor/${data}`);
+            }
+          }}
         >
           Save
         </button>
