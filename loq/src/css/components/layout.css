@@ -1,0 +1,19 @@
+#content {
+  flex-grow: 1;
+  padding: var(--content-padding);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#container {
+  flex: 1 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  flex: 1 0;
+  display: flex;
+  flex-direction: column;
+}

@@ -17,10 +17,39 @@
 
   --color-accent-0: rgba(184, 131, 234, 1);
   --color-accent-1: rgba(133, 131, 234, 1);
+  --error-color: #ed8c8c;
 
-  --accent-icon-filter: invert(100%);
+  --accent-icon-filter: invert(100%) opacity(87%);
 
   --section-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  --section-shadow-2: rgba(0, 0, 0, 0.15) 0px 4px 16px;
+  --section-background: #282828;
+  --section-background-hover: #2c2c2c;
+  --section-background-partial-opacity: #0000001a;
+  --section-background-partial-opacity-2: #00000068;
+  --section-border: #66666644;
+  --section-border-2: #88888844;
+  --section-border-3: #aaaaaa88;
+  --section-border-4: #cccc;
+
+  --accent-gradient: linear-gradient(135deg,
+      var(--color-accent-0) 0%,
+      var(--color-accent-1) 100%);
+
+  --answer-0: #6f17e8;
+  --answer-1: #e14848;
+  --answer-2: #2d912d;
+  --answer-3: #0ba5e2;
+  --answer-4: #a51d3f;
+  --answer-5: #24be85;
+  --answer-6: #c55c1f;
+  --answer-7: #b00be2;
+  --answer-8: #2b3abb;
+  --answer-9: #e20b0b;
+  --answer-10: #d2b48c;
+  --answer-11: #75196e;
+
+  --default-loq-background: url("/assets/backgrounds/main.png");
 }
 
 img {
@@ -29,6 +58,17 @@ img {
 
 body {
   margin: 0;
+  display: flex;
+  align-content: stretch;
+  min-width: 320px;
+  min-height: 100vh;
+  flex-direction: column;
+  font-family: var(--main-font);
+  color: var(--main-text-color);
+}
+
+textarea {
+  font-family: var(--font);
 }
 
 * {

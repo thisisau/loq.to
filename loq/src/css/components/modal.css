@@ -20,11 +20,11 @@
 }
 
 .modal>div {
-  max-width: min(80%, 480px);
+  max-width: min(calc(100% - 24px), 480px);
 }
 
 .modal>div.size-1 {
-  max-width: min(90%, 960px);
+  max-width: min(calc(100% - 24px), 960px);
 }
 
 .modal-body {
@@ -70,9 +70,7 @@
 
 .modal-head {
   flex: 0 0 75px;
-  background: linear-gradient(135deg,
-      var(--color-accent-0) 0%,
-      var(--color-accent-1) 100%);
+  background: var(--accent-gradient);
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   margin: -1px;

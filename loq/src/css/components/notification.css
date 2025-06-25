@@ -1,0 +1,50 @@
+.notification {
+  position: absolute;
+  /* left: 0;
+  top: 0; */
+  width: 384px;
+  height: 96px;
+  background: var(--accent-gradient);
+  border-radius: 12px;
+  display: grid;
+  grid-template-rows: 4px 24px 1fr;
+  grid-template-columns: 1fr 32px;
+  overflow: hidden;
+}
+
+.notification>.progress {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  background-color: white;
+}
+
+.notification>.notification-close {
+  grid-row: 2;
+  grid-column: 2;
+  width: 24px;
+  height: 24px;
+  padding: 2px;
+  margin-right: 8px;
+}
+
+.notification>.notification-title {
+  font-weight: bold;
+  margin-left: 8px;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.notification>.notification-body {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+
+  margin: 8px;
+  margin-top: 0;
+}

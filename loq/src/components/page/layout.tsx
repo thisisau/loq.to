@@ -3,7 +3,12 @@ import Header from "./header";
 
 export default function Layout(props: {
   hideHeader?: boolean;
-  children?: ReactNode
+  children?: ReactNode;
 }) {
-  return <div id="container">{props.hideHeader ? null : <Header />}<div id="content">{props.children}</div></div>
+  return (
+    <div id="container">
+      {props.hideHeader ? null : <Header />}
+      <div id="content">{props.children}</div>
+    </div>
+  );
 }

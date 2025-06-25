@@ -1,0 +1,83 @@
+-- Test if username exists function
+create
+or replace function public.username_exists (username_new TEXT) returns boolean
+set
+  search_path = '' as $$ BEGIN
+return EXISTS(SELECT 1 FROM public.profiles WHERE LOWER(username) = LOWER(username_new) and id <> auth.uid()); END; $$ language plpgsql security DEFINER;
+
+-- Test if username is valid function
+create
+or replace function public.username_is_invalid (username_new TEXT) returns boolean
+set
+  search_path = ''
+as $$
+  BEGIN
+    return public.username_exists(username_new) or username_new ~ '[^a-zA-Z0-9_\-\.]|^_|_$|[-_\.]{2}' or length(username_new) > 16 
+   OR length(username_new) < 3;
+  END;
+$$ language plpgsql security definer;
+
+-- Generate username from email function
+create
+or replace function public.generate_username_from_email(email TEXT) returns text
+set
+  search_path = ''
+as $$
+declare
+  username_attempt TEXT;
+  replaced_email TEXT;
+BEGIN
+  replaced_email := replace(email, '+', '');
+  username_attempt := substring(replaced_email, 1, POSITION('@' IN replaced_email)-1);
+
+  if public.username_is_invalid (username_attempt)
+  then
+    -- loop_attempt:
+    loop
+      username_attempt := 'user_'|| to_char(trunc(random()*100000000), 'FM00000000');
+      if not public.username_is_invalid (username_attempt) then
+        exit ;
+      end if;
+    end loop ;
+  end if;
+
+  return username_attempt;
+END; $$
+language plpgsql security definer;
+
+-- Create profile for new user function
+create
+or replace function public.create_profile_for_new_user () returns trigger
+set
+  search_path = '' as $$
+declare
+  generated_username text;
+ BEGIN
+  generated_username := public.generate_username_from_email(NEW.email);
+  INSERT INTO public.profiles (id, display_name, username)
+  VALUES (NEW.id, generated_username, generated_username);
+  RETURN NEW;
+ END; $$ language plpgsql security definer;
+
+create trigger create_profile_from_auth after
+insert
+    on
+    auth.users for each row execute function public.create_profile_for_new_user();
+
+-- Allow user to change username
+create or replace function public.update_username(new_username text)
+returns void
+set search_path = ''
+as $$
+BEGIN
+  if public.username_exists(new_username) then
+    RAISE EXCEPTION SQLSTATE '90000' using message = 'This username is taken.';
+  end if;
+  if public.username_is_invalid(new_username) then
+    RAISE EXCEPTION SQLSTATE '90001' using message = 'This username is invalid.';
+  end if;
+  update public.profiles set username = new_username where id = auth.uid();
+end;
+$$
+language plpgsql
+security definer;

@@ -1,0 +1,276 @@
+/* Text input */
+
+.text-input-component {
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 18px;
+  border: 1px solid var(--section-border-2);
+  color: var(--main-text-color);
+}
+
+textarea.text-input-component {
+  resize: none;
+}
+
+.text-input-component:focus {
+  outline: 1px solid var(--color-accent-0);
+}
+
+
+.text-input-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border-radius: 12px;
+}
+
+.text-input-container>input {
+  flex-grow: 1;
+}
+
+/* Button input */
+
+.button-component {
+  padding: 12px;
+  border: unset;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background-color: var(--color-accent-0);
+  font-family: var(--font);
+  font-size: 12pt;
+  border-radius: 12px;
+  transition: ease 200ms;
+  align-self: stretch;
+  cursor: pointer;
+}
+
+.button-component.dark {
+  background-color: transparent;
+  border: 1px solid var(--section-border-2);
+  color: var(--main-text-color);
+}
+
+.button-component.dark:hover {
+  backdrop-filter: brightness(125%);
+}
+
+.button-component:hover {
+  filter: brightness(110%);
+}
+
+.button-component:active {
+  transform: translateY(2px);
+  filter: brightness(120%);
+}
+
+/* Checkbox and radio */
+input[type="checkbox"],
+input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+
+  background-color: var(--section-background);
+
+  margin: 0;
+
+  font: inherit;
+  color: var(--main-text-color);
+  width: 1.8em;
+  height: 1.8em;
+  border: 1px solid var(--section-border);
+  border-radius: 0.3em;
+  /* transform: translateY(-0.075em); */
+  display: grid;
+  place-content: center;
+
+  flex: 0 0 auto;
+
+  transition: background-color 200ms ease;
+}
+
+input[type="checkbox"]:not(:checked):hover,
+input[type="radio"]:not(:checked):hover {
+  background-color: var(--section-background-hover);
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background-color: var(--color-accent-0);
+}
+
+
+input[type="radio"] {
+  border-radius: 1em;
+}
+
+input[type="checkbox"]::before,
+input[type="radio"]::before {
+  content: "";
+  width: 0.85em;
+  height: 0.85em;
+  transform: scale(0);
+  transition: 60ms transform ease-in-out;
+  box-shadow: inset 1em 1em var(--main-text-color);
+}
+
+
+input[type="checkbox"]::before {
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+input[type="radio"]:checked::before {
+  transform: scale(1.2);
+}
+
+input[type="checkbox"]:checked::before {
+  transform: scale(1.4);
+}
+
+input[type="radio"]::before {
+  border-radius: 1em;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dropdown-body .input-group {
+  flex-wrap: nowrap;
+  justify-content: start;
+}
+
+.input-group>span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Dropdown component */
+
+.dropdown,
+.text-input-container {
+  position: relative;
+}
+
+.dropdown > .dropdown-head > button {
+  font-size: 12pt;
+  background-color: var(--section-background);
+  border: 1px solid var(--section-border-2);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.dropdown > .dropdown-head > button > span,
+.dropdown > .dropdown-body > button > span,
+.input-autocomplete-results > button > span {
+  flex: 1 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--main-text-color);
+}
+
+.dropdown > .dropdown-head > button > img {
+  height: 24px;
+  transform: rotate(90deg);
+}
+
+.dropdown.open > .dropdown-head > button > img {
+  transform: rotate(-90deg);
+}
+
+.dropdown > .dropdown-body,
+.input-autocomplete-results {
+  position: absolute;
+  transform: translateY(8px);
+  display: flex;
+  flex-direction: column;
+  max-height: 250px;
+  overflow-y: scroll;
+  border-radius: 12px;
+  border: 1px solid var(--section-border-2);
+  width: 100%;
+  background-color: var(--section-background);
+  z-index: 2;
+}
+
+.dropdown > .dropdown-head,
+.dropdown > .dropdown-body,
+.input-autocomplete-results {
+  box-shadow: var(--section-shadow);
+}
+
+.input-autocomplete-results {
+  transform: translateY(56px) translateX(-1px);
+}
+
+.dropdown > .dropdown-body > button,
+.input-autocomplete-results > button {
+  flex: 0 0 fit-content;
+  font-size: 12pt;
+  background-color: var(--section-background);
+  transition: background-color ease 200ms;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.dropdown > .dropdown-body > button:focus,
+.input-autocomplete-results > button:focus {
+  outline: 2px solid var(--color-accent-0);
+  z-index: 1;
+}
+
+.dropdown > .dropdown-body > button:not(:first-child),
+.input-autocomplete-results > button:not(:first-child) {
+  border-top: 1px solid var(--section-border-2);
+}
+
+.dropdown > .dropdown-body > button:hover,
+.dropdown > .dropdown-body > button.active,
+.input-autocomplete-results > button:hover,
+.input-autocomplete-results > button:active {
+  background-color: var(--section-background-hover);
+}
+
+.form-item {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+}
+
+.form-item > hr {
+  flex-grow: 1;
+  height: 0;
+  border: none;
+  border-top: 1px solid var(--section-border);
+  min-width: 12px;
+}
+
+.multiline-form-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+}

@@ -34,13 +34,109 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          display_name: string | null
+          id: string
+          last_updated: string
+          username: string
+        }
+        Insert: {
+          display_name?: string | null
+          id: string
+          last_updated?: string
+          username: string
+        }
+        Update: {
+          display_name?: string | null
+          id?: string
+          last_updated?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      quizzes: {
+        Row: {
+          author: string | null
+          contents: Json | null
+          copy_protect: boolean
+          created_at: string
+          description: string
+          id: number
+          interactions: number
+          last_updated: string
+          last_used: string
+          likes: number
+          title: string
+          visibility: number
+        }
+        Insert: {
+          author?: string | null
+          contents?: Json | null
+          copy_protect?: boolean
+          created_at?: string
+          description?: string
+          id?: number
+          interactions?: number
+          last_updated?: string
+          last_used?: string
+          likes?: number
+          title?: string
+          visibility?: number
+        }
+        Update: {
+          author?: string | null
+          contents?: Json | null
+          copy_protect?: boolean
+          created_at?: string
+          description?: string
+          id?: number
+          interactions?: number
+          last_updated?: string
+          last_used?: string
+          likes?: number
+          title?: string
+          visibility?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_author_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_username_from_email: {
+        Args: {
+          email: string
+        }
+        Returns: string
+      }
+      update_username: {
+        Args: {
+          new_username: string
+        }
+        Returns: undefined
+      }
+      username_exists: {
+        Args: {
+          username_new: string
+        }
+        Returns: boolean
+      }
+      username_is_invalid: {
+        Args: {
+          username_new: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
