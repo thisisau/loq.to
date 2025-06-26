@@ -193,7 +193,7 @@ input[type="radio"]::before {
 .dropdown > .dropdown-body,
 .input-autocomplete-results {
   position: absolute;
-  transform: translateY(8px);
+  top: calc(100% + 8px);
   display: flex;
   flex-direction: column;
   max-height: 250px;

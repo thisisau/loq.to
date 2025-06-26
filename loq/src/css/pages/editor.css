@@ -504,6 +504,7 @@
   .loq-editor .editor-content>.question-options {
     grid-row: -2;
     grid-column: 1;
+    height: fit-content;
   }
 
   .modal-input .button-component {

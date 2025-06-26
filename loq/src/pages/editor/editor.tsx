@@ -217,6 +217,18 @@ function Editor(props: { initialContents: Contents }) {
             {page[0].mode === "settings" ? <Settings /> : <Questions />}
           </div>
         </Layout>
+        <title>
+          {`${page[0].unsavedChanges ? "*" : ""}
+            ${loq[0].settings.title} - loq.to`}
+        </title>
+        <meta
+          name="description"
+          content={`Create, edit, and fine-tune ${
+            loq[0].settings.title === getEmptyLOQ().settings.title
+              ? "your own loq quiz"
+              : loq[0].settings.title
+          } on loq.to!`}
+        />
       </ActivePageContext.Provider>
     </LOQContext.Provider>
   );
@@ -300,8 +312,8 @@ function EditorSidebar() {
             );
             setPage({
               ...page,
-              unsavedChanges: false
-            })
+              unsavedChanges: false,
+            });
             if (data && data !== id) {
               navigate(`/editor/${data}`);
             }

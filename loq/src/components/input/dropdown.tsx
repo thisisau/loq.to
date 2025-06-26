@@ -1,15 +1,55 @@
-import { ReactNode, CSSProperties, useState, useRef, useEffect } from "react";
+import {
+  ReactNode,
+  CSSProperties,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import { concatClasses } from "../../functions/functions";
 import { AnimatePresence, motion } from "motion/react";
 
 function AnimatedDropdownBody(props: { children?: ReactNode }) {
+  // const bodyRefCallback = useCallback((node: HTMLDivElement | null) => {
+  //   console.log("Got here :(");
+  //   console.log(node);
+
+  //   if (node === null) return;
+  //   const dropdownBodyPosition = node.getBoundingClientRect();
+  //   console.log("pos", dropdownBodyPosition);
+  //   console.log(dropdownBodyPosition.bottom + 8);
+  //   console.log(window.innerHeight);
+
+  //   if (dropdownBodyPosition.top + node.offsetHeight + 8 > window.innerHeight) {
+  //     console.log("Got here!");
+
+  //     if (!displayAbove) setDisplayAbove(true);
+  //   } else {
+  //     console.log("Got here!!!!!!!!!");
+
+  //     if (displayAbove) setDisplayAbove(false);
+  //   }
+  // }, []);
+
+  // const [displayAbove, setDisplayAbove] = useState<boolean>(false);
+
+  // console.log("Display above is currently set to", displayAbove);
+
   return (
     <motion.div
+      // ref={bodyRefCallback}
+      // style={
+      //   displayAbove
+      //     ? {
+      //         bottom: "-100%",
+      //         top: "unset"
+      //       }
+      //     : undefined
+      // }
       className="dropdown-body"
       initial={{
         scaleY: 0,
         transformOrigin: "top center",
-        translateY: 8,
       }}
       animate={{
         scaleY: 1,
@@ -88,7 +128,7 @@ export function DropdownInput(props: {
   options: Array<ReactNode>;
   onUpdate?: (value: number) => void;
   defaultOption?: number;
-  headAriaLabel?: string
+  headAriaLabel?: string;
 }) {
   const [value, setValue] = useState(props.defaultOption ?? 0);
   const [isOpen, setIsOpen] = useState(false);
