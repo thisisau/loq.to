@@ -13,9 +13,9 @@ export function GlobalElement() {
   return (
     <>
       {elements.map((e) => (
-        <AlertsContext.Provider value={e} key={e.id}>
+        <AlertsContext value={e} key={e.id}>
           {e.content}
-        </AlertsContext.Provider>
+        </AlertsContext>
       ))}
     </>
   );

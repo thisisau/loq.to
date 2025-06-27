@@ -1,39 +1,22 @@
-import {
-  ReactNode,
-  CSSProperties,
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-} from "react";
+import { ReactNode, CSSProperties, useState, useRef, useEffect } from "react";
 import { concatClasses } from "../../functions/functions";
 import { AnimatePresence, motion } from "motion/react";
 
 function AnimatedDropdownBody(props: { children?: ReactNode }) {
   // const bodyRefCallback = useCallback((node: HTMLDivElement | null) => {
-  //   console.log("Got here :(");
-  //   console.log(node);
-
   //   if (node === null) return;
   //   const dropdownBodyPosition = node.getBoundingClientRect();
-  //   console.log("pos", dropdownBodyPosition);
-  //   console.log(dropdownBodyPosition.bottom + 8);
-  //   console.log(window.innerHeight);
 
   //   if (dropdownBodyPosition.top + node.offsetHeight + 8 > window.innerHeight) {
-  //     console.log("Got here!");
 
   //     if (!displayAbove) setDisplayAbove(true);
   //   } else {
-  //     console.log("Got here!!!!!!!!!");
 
   //     if (displayAbove) setDisplayAbove(false);
   //   }
   // }, []);
 
   // const [displayAbove, setDisplayAbove] = useState<boolean>(false);
-
-  // console.log("Display above is currently set to", displayAbove);
 
   return (
     <motion.div

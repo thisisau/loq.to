@@ -67,6 +67,7 @@ export type Database = {
           last_used: string
           likes: number
           quiz_description: string
+          thumbnail: Json | null
           title: string
           visibility: Database["public"]["Enums"]["visibility"] | null
         }
@@ -81,6 +82,7 @@ export type Database = {
           last_used?: string
           likes?: number
           quiz_description?: string
+          thumbnail?: Json | null
           title?: string
           visibility?: Database["public"]["Enums"]["visibility"] | null
         }
@@ -95,6 +97,7 @@ export type Database = {
           last_used?: string
           likes?: number
           quiz_description?: string
+          thumbnail?: Json | null
           title?: string
           visibility?: Database["public"]["Enums"]["visibility"] | null
         }

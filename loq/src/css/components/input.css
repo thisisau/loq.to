@@ -200,9 +200,9 @@ input[type="radio"]::before {
   overflow-y: scroll;
   border-radius: 12px;
   border: 1px solid var(--section-border-2);
-  width: 100%;
+  width: calc(100% - 2px);
   background-color: var(--section-background);
-  z-index: 2;
+  z-index: 20;
 }
 
 .dropdown > .dropdown-head,

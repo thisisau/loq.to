@@ -12,8 +12,8 @@ export default function NotificationProvider(props: { children?: ReactNode }) {
   });
 
   return (
-    <NotificationContext.Provider value={notification}>
+    <NotificationContext value={notification}>
       {props.children}
-    </NotificationContext.Provider>
+    </NotificationContext>
   );
 }

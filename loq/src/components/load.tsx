@@ -12,7 +12,7 @@ declare module "react" {
     }
   }
 }
-export default function Loader(props: {
+export function Loader(props: {
   children?: ReactNode
 }) {
   return (
@@ -21,4 +21,10 @@ export default function Loader(props: {
       {props.children}
     </div>
   );
+}
+
+export function FullscreenLoader() {
+  return <div className="loading">
+          <Loader />
+        </div>;
 }

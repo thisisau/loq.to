@@ -7,6 +7,9 @@ import "./css/pages/login.css";
 import "./css/components/input.css";
 import "./css/pages/editor.css";
 import "./css/components/notification.css";
+import "./css/components/display.css";
+import "./css/pages/saved.css";
+
 import {
   AlertHandler,
   AlertHandlerContext,
@@ -19,25 +22,32 @@ import Login from "./pages/account/login";
 import UserProfile from "./pages/account/profile";
 import Editor from "./pages/editor/editor";
 import NotificationProvider from "./components/page/notification/provider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Saved from "./pages/saved/saved";
 
 function App() {
   const alertHandler = useRef(new AlertHandler());
 
+  const queryClient = new QueryClient();
+
   return (
-    <AlertHandlerContext.Provider value={alertHandler.current}>
-      <NotificationProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="login" element={<Login />} />
-            <Route path="account" element={<UserProfile />} />
-            <Route path="editor/:id?" element={<Editor />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-        <GlobalElement />
-      </NotificationProvider>
-    </AlertHandlerContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <AlertHandlerContext value={alertHandler.current}>
+        <NotificationProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="login" element={<Login />} />
+              <Route path="account" element={<UserProfile />} />
+              <Route path="editor/:id?" element={<Editor />} />
+              <Route path="saved" element={<Saved />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+          <GlobalElement />
+        </NotificationProvider>
+      </AlertHandlerContext>
+    </QueryClientProvider>
   );
 }
 

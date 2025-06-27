@@ -8,7 +8,8 @@ export function concatClasses(...classes: ClassArray): string {
       else e = e.trim();
       return e;
     })
-    .join(" ");
+    .join(" ")
+    .trim();
 }
 
 export function getRedirect(
@@ -17,15 +18,18 @@ export function getRedirect(
 ) {
   const redirect = new URLSearchParams(locationURL.search).get("redirect");
   if (!redirect) return defaultRedirect;
-  return `${locationURL.protocol}//${locationURL.host}/${decodeURIComponent(
-    redirect
-  )}`;
+  let redirectURL = decodeURIComponent(redirect);
+  console.log("REDIRECT URL IS", redirectURL);
+
+  while (redirectURL.startsWith("/")) redirectURL = redirectURL.substring(1);
+
+  console.log("REDIRECT URL IS", redirectURL);
+  return `${locationURL.protocol}//${locationURL.host}/${redirectURL}`;
 }
 
 export function getYoutubeVideoID(url: string) {
   const regExp =
     /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|&v=)([^#&?]*).*/;
-  console.log(url);
   const match = url.match(regExp);
 
   return match && match[2].length === 11 ? match[2] : null;

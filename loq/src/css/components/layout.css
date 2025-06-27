@@ -17,3 +17,42 @@
   display: flex;
   flex-direction: column;
 }
+
+.main-header {
+  flex: 0 0 40px;
+  background: var(--accent-gradient);
+  margin: 12px;
+  width: calc(100% - 40px);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  color: var(--text-on-gradient-color);
+}
+
+.main-header>div {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.main-header a {
+  transition: opacity ease 200ms;
+}
+
+.main-header a:hover {
+  opacity: .75;
+}
+
+.main-header > div:last-child a {
+  margin-right: 8px;
+  height: min-content;
+  align-self: center;
+  color: var(--text-on-gradient-color);
+}
+
+.main-header img {
+  height: 100%;
+}

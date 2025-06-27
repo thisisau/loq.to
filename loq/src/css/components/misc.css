@@ -79,3 +79,10 @@ a:hover {
 .button-icon-container:hover {
   backdrop-filter: brightness(125%);
 }
+
+.loading {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

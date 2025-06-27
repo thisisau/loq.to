@@ -1,0 +1,45 @@
+.table {
+  padding: 0;
+  border-spacing: 0;
+  display: table;
+}
+
+.table .header {
+  display: table-header-group;
+  vertical-align: middle;
+}
+
+.table .body {
+  display: table-row-group;
+  vertical-align: middle;
+}
+
+.table .row {
+  display: table-row;
+}
+
+.table .cell {
+  display: table-cell;
+  padding: 8px;
+}
+
+.table .cell:not(:first-child) {
+  border-left: 1px solid var(--section-border);
+}
+
+.table .body .cell {
+  border-top: 1px solid var(--section-border);
+}
+
+.table .link {
+  color: var(--main-text-color);
+  text-decoration: none;
+}
+
+.table .hover-animation {
+  transition: background-color ease 200ms;
+}
+
+.table .hover-animation:hover {
+  background-color: var(--section-background-hover);
+}

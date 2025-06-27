@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from "motion/react";
 
 import Layout from "../../components/page/layout";
-import { isValidElement, ReactNode, useRef, useState } from "react";
+import { ReactNode, useState } from "react";
 import { TextInput } from "../../components/input/text";
 import Button from "../../components/input/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useMutableState } from "../../functions/hooks";
 import { concatClasses, getRedirect } from "../../functions/functions";
 import {
@@ -22,11 +22,16 @@ import {
 } from "../../components/alerts/alert_hooks";
 import { Modal } from "../../components/page/modal";
 import supabase from "../../supabase/client";
+import { errorCodeExists, errorCodes } from "../../supabase/error";
 
 function isValidCredentials(credentials: { email: string; password: string }) {
   return (
     isValidEmail(credentials.email) && isValidPassword(credentials.password)
   );
+}
+
+function isValidCode(code: string) {
+  return !isNaN(Number(code)) && code.length === 6;
 }
 
 export default function Login() {
@@ -43,7 +48,7 @@ export default function Login() {
           </Link>
         </div>
         <div className="login-container-content">
-          <GenericForm mode="login" />
+          <GenericForm />
         </div>
       </div>
     </Layout>
@@ -68,6 +73,7 @@ const LoginForm = () => {
           textAlign="center"
           onUpdate={(e) => updateCredentials((value) => (value.email = e))}
           maxLength={254}
+          type="email"
         />
         <TextInput
           placeholder="Password"
@@ -78,7 +84,12 @@ const LoginForm = () => {
         />
         <Button
           onClick={() => {
-            attemptAuthentication("login", credentials, setErrorContent);
+            attemptAuthentication("login", credentials, setErrorContent).then(
+              (e) => {
+                if (e.success)
+                  window.location.href = getRedirect(window.location);
+              }
+            );
           }}
           id={"login-submit"}
           className={concatClasses(
@@ -92,7 +103,16 @@ const LoginForm = () => {
       </div>
       <div className="login-form-footer">
         <div>
-          <Link to="/forgot">Forgot your password?</Link>
+          <Link
+            to="."
+            onClick={() => {
+              setPage("forgotPassword", {
+                email: credentials.email,
+              });
+            }}
+          >
+            Forgot your password?
+          </Link>
         </div>
         <div>
           Don't have an account?{" "}
@@ -107,15 +127,7 @@ const LoginForm = () => {
           !
         </div>
         <div>
-          <Link
-            to={`${window.location.protocol}//${
-              window.location.host
-            }/${decodeURIComponent(
-              new URLSearchParams(window.location.search).get("redirect") || ""
-            )}`}
-          >
-            ↜ Back
-          </Link>
+          <Link to={getRedirect(window.location)}>↜ Back</Link>
         </div>
       </div>
     </>
@@ -200,15 +212,7 @@ const SignupForm = () => {
           !
         </div>
         <div>
-          <Link
-            to={`${window.location.protocol}//${
-              window.location.host
-            }/${decodeURIComponent(
-              new URLSearchParams(window.location.search).get("redirect") || ""
-            )}`}
-          >
-            ↜ Back
-          </Link>
+          <Link to={getRedirect(window.location)}>↜ Back</Link>
         </div>
       </div>
     </>
@@ -251,10 +255,6 @@ const VerifyEmail = () => {
         </div>
       </>
     );
-  }
-
-  function isValidCode(code: string) {
-    return !isNaN(Number(code)) && code.length === 6;
   }
 
   return (
@@ -356,7 +356,6 @@ const VerifyEmail = () => {
 
 const AccountInfo = () => {
   const { state } = usePaginate<LoginFormPages, "accountInfo">();
-  const navigate = useNavigate();
   const email: string | undefined =
     typeof state.email === "string" && isValidEmail(state.email)
       ? state.email
@@ -396,15 +395,14 @@ const AccountInfo = () => {
               );
               return;
             }
-            const { data, error } = await supabase.rpc("update_username", {
+            const { error } = await supabase.rpc("update_username", {
               new_username: credentials.username,
             });
             if (error) {
               setErrorContent(error.message);
               return;
             }
-            console.log("Success!!!!!!");
-            window.location.href = getRedirect(window.location)
+            window.location.href = getRedirect(window.location);
           }}
           id={"login-submit"}
           className={concatClasses(
@@ -460,14 +458,224 @@ const AccountInfo = () => {
   );
 };
 
+const ForgotPassword = () => {
+  const { state, setPage } = usePaginate<LoginFormPages, "forgotPassword">();
+
+  const [credentials, updateCredentials] = useMutableState({
+    email: state?.email ?? "",
+  });
+  const [errorContent, setErrorContent] = useState<ReactNode>(null);
+
+  return (
+    <>
+      <div className="login-title">Reset Password</div>
+      <hr />
+      <div className="login-form-content">
+        <div className="center-text">
+          Enter your email below to send a password reset message.
+        </div>
+        <TextInput
+          placeholder="Email Address"
+          textAlign="center"
+          onUpdate={(e) => updateCredentials((value) => (value.email = e))}
+          maxLength={254}
+          type="email"
+        />
+        <Button
+          onClick={async () => {
+            if (!isValidEmail(credentials.email)) {
+              setErrorContent("Your email address is invalid.");
+              return;
+            }
+            const { error } = await supabase.auth.resetPasswordForEmail(
+              credentials.email
+            );
+            if (error) {
+              setErrorContent(`An error occurred: ${error.message}`);
+            } else {
+              setPage("verifyForgotPassword", { email: credentials.email });
+            }
+          }}
+          id={"login-submit"}
+          className={concatClasses(
+            !isValidEmail(credentials.email) && "no-access"
+          )}
+          type="submit"
+        >
+          Continue
+        </Button>
+        <span className="login-error">{errorContent}</span>
+      </div>
+      <div className="login-form-footer">
+        <div>
+          <Link
+            to={"#"}
+            onClick={(e) => {
+              e.preventDefault();
+              setPage("login", undefined);
+            }}
+          >
+            ↜ Back
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const VerifyForgotPassword = () => {
+  const { state, setPage } = usePaginate<
+    LoginFormPages,
+    "verifyForgotPassword"
+  >();
+
+  const [credentials, updateCredentials] = useMutableState({
+    verificationCode: "",
+  });
+
+  const [errorContent, setErrorContent] = useState<ReactNode>(null);
+
+  return (
+    <>
+      <div className="login-title">Reset Password</div>
+      <hr />
+      <div className="login-form-content">
+        <div className="center-text">
+          Enter the six-digit verification code that was sent to {state?.email}.
+        </div>
+        <TextInput
+          placeholder="Verification Code"
+          textAlign="center"
+          onUpdate={(e) =>
+            updateCredentials((value) => (value.verificationCode = e))
+          }
+          maxLength={6}
+          type="number"
+        />
+        <Button
+          onClick={async () => {
+            if (!isValidCode(credentials.verificationCode)) {
+              setErrorContent("Your code must be a six-digit number.");
+              return;
+            }
+            const { error } = await supabase.auth.verifyOtp({
+              type: "email",
+              token: credentials.verificationCode,
+              email: state.email,
+            });
+            if (error) {
+              switch (error.code) {
+                case "otp_expired":
+                  setErrorContent(
+                    "Your verification code is invalid or has expired."
+                  );
+                  break;
+                default:
+                  setErrorContent(`An error occurred: ${error.message}`);
+              }
+              return;
+            }
+            setPage("createNewPassword", state);
+          }}
+          id={"login-submit"}
+          className={concatClasses(
+            !isValidCode(credentials.verificationCode) && "no-access"
+          )}
+          type="submit"
+        >
+          Continue
+        </Button>
+        <span className="login-error">{errorContent}</span>
+      </div>
+      <div className="login-form-footer">
+        <div>
+          <Link
+            to={"#"}
+            onClick={(e) => {
+              e.preventDefault();
+              setPage("forgotPassword", state);
+            }}
+          >
+            ↜ Back
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const CreateNewPassword = () => {
+  const [errorContent, setErrorContent] = useState<ReactNode>(null);
+  const [credentials, updateCredentials] = useMutableState({
+    password: "",
+    passwordConfirmation: "",
+  });
+
+  return (
+    <>
+      <div className="login-title">Update Password</div>
+      <hr />
+      <div className="login-form-content">
+        <TextInput
+          placeholder="Password"
+          type="password"
+          textAlign="center"
+          onUpdate={(e) => updateCredentials((value) => (value.password = e))}
+          maxLength={128}
+        />
+        <TextInput
+          placeholder="Confirm Password"
+          type="password"
+          textAlign="center"
+          onUpdate={(e) =>
+            updateCredentials((value) => (value.passwordConfirmation = e))
+          }
+          maxLength={128}
+        />
+        <Button
+          onClick={async () => {
+            if (credentials.password !== credentials.passwordConfirmation) {
+              setErrorContent("Your passwords do not match!");
+              return;
+            }
+            const { error } = await supabase.auth.updateUser({
+              password: credentials.password,
+            });
+            if (error === null) {
+              window.location.href = `/account`;
+              return;
+            }
+            setErrorContent(
+              errorCodeExists(error.code)
+                ? errorCodes[error.code!]
+                : `An error with code ${error.code} occurred: ${error.message}`
+            );
+          }}
+          id={"login-submit"}
+          className={concatClasses(
+            credentials.passwordConfirmation === "" && "no-access"
+          )}
+          type="submit"
+        >
+          Continue
+        </Button>
+        <span className="login-error">{errorContent}</span>
+      </div>
+    </>
+  );
+};
+
 export type LoginFormPages = {
   signup: undefined;
   login: undefined;
   verifyEmail: { email: string };
   accountInfo: { email: string };
+  forgotPassword: { email: string };
+  verifyForgotPassword: { email: string };
+  createNewPassword: { email: string };
 };
 
-function GenericForm(props: { mode: "signup" | "login" }) {
+function GenericForm() {
   return (
     <PaginateContainer<LoginFormPages, "login">
       pages={{
@@ -475,6 +683,9 @@ function GenericForm(props: { mode: "signup" | "login" }) {
         login: <LoginForm />,
         verifyEmail: <VerifyEmail />,
         accountInfo: <AccountInfo />,
+        forgotPassword: <ForgotPassword />,
+        verifyForgotPassword: <VerifyForgotPassword />,
+        createNewPassword: <CreateNewPassword />,
       }}
       defaultPage={"login"}
       defaultState={undefined}

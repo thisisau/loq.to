@@ -40,7 +40,7 @@
 //   };
 
 //   return (
-//     <PaginateNavigatorContext.Provider
+//     <PaginateNavigatorContext
 //       value={{
 //         currentPage: page,
 //         setPage: changePageAndState,
@@ -58,7 +58,7 @@
 //             setState,
 //           })
 //         : props.pages[page]}
-//     </PaginateNavigatorContext.Provider>
+//     </PaginateNavigatorContext>
 //   );
 // }
 

@@ -19,7 +19,7 @@ export type Contents = {
 };
 
 export type Settings = {
-  thumbnail?: Image;
+  thumbnail: Image | null;
   title: string;
   description: string;
   options: {

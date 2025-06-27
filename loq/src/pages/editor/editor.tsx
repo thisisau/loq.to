@@ -1,6 +1,7 @@
 import {
   createContext,
   CSSProperties,
+  Suspense,
   useContext,
   useEffect,
   useState,
@@ -16,13 +17,11 @@ import {
   TextImageAnswerContent,
   TrueFalseAnswer,
   Video,
-  Visibility,
 } from "./editor.types";
 
-import Loader from "../../components/load";
+import { FullscreenLoader } from "../../components/load";
 import { useMutableState } from "../../functions/hooks";
 import Layout from "../../components/page/layout";
-import { PaginateContainer } from "../../components/paginate/paginate";
 import {
   ButtonIconWithTooltip,
   ElementWithTooltip,
@@ -44,6 +43,8 @@ import Notification from "../../components/page/notification/notification";
 import { AnimatePresence, motion } from "motion/react";
 import supabase from "../../supabase/client";
 import { useUserInfo } from "../../functions/userInfo";
+import { fetchLOQ } from "../../functions/database";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 const questionTypes: Array<{ type: QuestionType; display: string }> = [
   {
@@ -126,6 +127,7 @@ function getEmptyLOQ(): Contents {
     settings: {
       title: "Untitled LOQ",
       description: "",
+      thumbnail: null,
       options: {
         randomizeQuestionOrder: false,
         visibility: "public",
@@ -136,15 +138,37 @@ function getEmptyLOQ(): Contents {
   };
 }
 
-export default function EditorContainer(props: { initialID?: string }) {
+export default function EditorContainer() {
+  return (
+    <Suspense fallback={<FullscreenLoader />}>
+      <EditorContent />
+    </Suspense>
+  );
+}
+
+function EditorContent() {
   const params = useParams();
-  const [id, setID] = useState(params.id ?? null);
+  const id = params.id ?? null;
+  const addNotification = useAddNotification();
+  const navigate = useNavigate();
 
-  console.log("id is", id);
+  const { data } = useSuspenseQuery({
+    queryKey: ["public", "quizzes", "id", id],
+    queryFn: () => fetchLOQ(id ?? NaN),
+  }).data;
 
-  // return <div><Loader /></div>;
+  useEffect(() => {
+    if (data === null && id !== null) {
+      addNotification(
+        <Notification title="Error" time={4000}>
+          A loq with ID {id} could not be found.
+        </Notification>
+      );
+      navigate("/editor");
+    }
+  }, []);
 
-  return <Editor initialContents={getEmptyLOQ()} />;
+  return <Editor initialContents={data ?? getEmptyLOQ()} />;
 }
 
 const LOQContext = createContext<
@@ -156,8 +180,6 @@ function useLOQ(): ReturnType<typeof useMutableState<Contents>> {
   const [page, setPage] = useActivePage();
 
   useEffect(() => {
-    console.log("unsaved?", page.unsavedChanges);
-
     if (page.unsavedChanges) window.onbeforeunload = () => true;
     else window.onbeforeunload = null;
   }, [page]);
@@ -209,8 +231,8 @@ function Editor(props: { initialContents: Contents }) {
   );
 
   return (
-    <LOQContext.Provider value={loq}>
-      <ActivePageContext.Provider value={page}>
+    <LOQContext value={loq}>
+      <ActivePageContext value={page}>
         <Layout hideHeader>
           <div className="loq-editor">
             <EditorSidebar />
@@ -218,8 +240,9 @@ function Editor(props: { initialContents: Contents }) {
           </div>
         </Layout>
         <title>
-          {`${page[0].unsavedChanges ? "*" : ""}
-            ${loq[0].settings.title} - loq.to`}
+          {`${page[0].unsavedChanges ? "*" : ""}${
+            loq[0].settings.title
+          } - loq.to`}
         </title>
         <meta
           name="description"
@@ -229,9 +252,16 @@ function Editor(props: { initialContents: Contents }) {
               : loq[0].settings.title
           } on loq.to!`}
         />
-      </ActivePageContext.Provider>
-    </LOQContext.Provider>
+      </ActivePageContext>
+    </LOQContext>
   );
+}
+
+function uploadLOQ(id: number, quiz: Contents) {
+  return supabase.rpc("upload_loq", {
+    loq_id: id,
+    loq_contents: quiz,
+  });
 }
 
 function EditorSidebar() {
@@ -248,7 +278,42 @@ function EditorSidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <Link to="/" draggable={false}>
+        <Link
+          to="/"
+          draggable={false}
+          onClick={async (e) => {
+            if (user.id === "") {
+              return;
+            }
+            if (page.unsavedChanges) e.preventDefault();
+            else return;
+            const id = isNaN(Number(params.id)) ? -1 : Number(params.id);
+            addNotification(
+              <Notification title="Uploading..." time={4000}>
+                Saving your loq...
+              </Notification>
+            );
+            const { error } = await uploadLOQ(id, quiz);
+            if (error) {
+              addNotification(
+                <Notification title="Error">
+                  An error occured when saving your loq: {error.message}
+                </Notification>
+              );
+              return;
+            }
+            addNotification(
+              <Notification title="Success!" time={4000}>
+                Your loq has been saved.
+              </Notification>
+            );
+            setPage({
+              ...page,
+              unsavedChanges: false,
+            });
+            navigate(`/`);
+          }}
+        >
           <img
             src="/assets/logos/loq/white.svg"
             alt="loq.to Logo"
@@ -292,11 +357,7 @@ function EditorSidebar() {
                 Saving your loq...
               </Notification>
             );
-
-            const { data, error } = await supabase.rpc("upload_loq", {
-              loq_id: id,
-              loq_contents: quiz,
-            });
+            const { data, error } = await uploadLOQ(id, quiz);
             if (error) {
               addNotification(
                 <Notification title="Error">

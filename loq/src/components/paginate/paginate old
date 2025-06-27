@@ -50,7 +50,7 @@
 //   };
 
 //   return (
-//     <ThisPaginateContext.Provider
+//     <ThisPaginateContext
 //       value={{
 //         currentPage: page,
 //         setPage: changePageAndState,
@@ -68,7 +68,7 @@
 //             setState,
 //           })
 //         : props.pages[page]}
-//     </ThisPaginateContext.Provider>
+//     </ThisPaginateContext>
 //   );
 // }
 

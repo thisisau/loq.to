@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { useMutableState } from "../../functions/hooks";
 
 // Allow different states per page
@@ -17,12 +17,14 @@ type NavigatorOptions<
   setState: ReturnType<typeof useMutableState<T[P]>>[2];
 };
 
-const PaginateNavigatorContext = createContext<NavigatorOptions<any, any> | undefined>(undefined);
+const PaginateNavigatorContext = createContext<
+  NavigatorOptions<any, any> | undefined
+>(undefined);
 
 export function PaginateContainer<
   S extends PaginateProperties,
   C extends string,
-  P extends keyof S & string = keyof S & string,
+  P extends keyof S & string = keyof S & string
 >(props: {
   pages: Record<P, ReactNode>;
   defaultPage: C & P;
@@ -32,26 +34,37 @@ export function PaginateContainer<
     options: NavigatorOptions<S, P>
   ) => ReactNode;
 }) {
-  const [page, setPage] = useState<P>(props.defaultPage);
-  const [state, updateState, setState] = useMutableState<S[P]>(props.defaultState);
+  const [page, updatePage, setPage] = useMutableState<{
+    page: P;
+    state: S[P];
+  }>({
+    page: props.defaultPage,
+    state: props.defaultState,
+  });
 
   function changePageAndState<K extends keyof S>(newPage: K, newState: S[K]) {
-    setPage(newPage as unknown as P); // cast needed because setPage is typed to P
-    setState(newState as unknown as S[P]);
+    setPage({
+      page: newPage as unknown as P,
+      state: newState as unknown as S[P],
+    }); // cast needed because setPage is typed to P
+    // updatePage(page => page.state = newState as unknown as S[P]);
   }
 
   const value: NavigatorOptions<S, P> = {
-    currentPage: page,
+    currentPage: page.page,
     setPage: changePageAndState,
-    state,
-    updateState,
-    setState,
+    state: page.state,
+    updateState: (newStateCallback) =>
+      updatePage((page) => newStateCallback(page.state)),
+    setState: (newState) => updatePage((page) => (page.state = newState)),
   };
 
   return (
-    <PaginateNavigatorContext.Provider value={value}>
-      {props.container ? props.container(() => props.pages[page], value) : props.pages[page]}
-    </PaginateNavigatorContext.Provider>
+    <PaginateNavigatorContext value={value}>
+      {props.container
+        ? props.container(() => props.pages[page.page], value)
+        : props.pages[page.page]}
+    </PaginateNavigatorContext>
   );
 }
 

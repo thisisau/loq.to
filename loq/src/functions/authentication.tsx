@@ -23,7 +23,6 @@ export async function attemptAuthentication(
   },
   setErrorContent: (content: ReactNode) => void
 ): Promise<BackendResponse<null>> {
-  console.log("Doing", mode, "with credentials", credentials);
   if (mode === "signup") {
     const { data, error } = await supabase.auth.signUp({
       email: credentials.email,
@@ -67,6 +66,7 @@ export async function attemptAuthentication(
         data: null,
       };
     }
+    console.log("Authentication success")
     return {
       success: true,
       data: null,

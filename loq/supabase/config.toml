@@ -155,6 +155,10 @@ sender_name = "loq.to"
 subject = "Your Email Confirmation Code"
 content_path = "./supabase/templates/email_confirmation.html"
 
+[auth.email.template.recovery]
+subject = "Reset Your Password"
+content_path = "./supabase/templates/email_recovery.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

@@ -61,7 +61,7 @@ where id = auth.uid();
 end;
 $$ language plpgsql security definer;
 -- Upload LOQ function
-create or replace function public.upload_loq(loq_id int8 , loq_contents json) returns int8
+create or replace function public.upload_loq(loq_id int8, loq_contents json) returns int8
 set search_path = '' as $$
 declare now_timestamp TIMESTAMP;
 upload_cutoff TIMESTAMP;
@@ -77,8 +77,9 @@ WHERE quizzes.created_at > upload_cutoff
   and quizzes.author = auth.uid();
 if recent_count >= 5 then RAISE EXCEPTION SQLSTATE '90101' using message = 'You have uploaded 5 loqs in the past 15 minutes. Please wait a few minutes before uploading another loq.';
 end if;
-if ((loq_id is null) or
-  not exists(
+if (
+  (loq_id is null)
+  or not exists(
     select 1
     from public.quizzes
     where author = auth.uid()
@@ -91,7 +92,9 @@ insert into public.quizzes (
     quiz_description,
     visibility,
     copy_protect,
-    contents
+    thumbnail,
+    contents,
+    last_updated
   )
 VALUES (
     auth.uid(),
@@ -99,7 +102,9 @@ VALUES (
     loq_contents#>>'{settings,description}',
     (loq_contents#>>'{settings,options,visibility}')::public.visibility,
     (loq_contents#>>'{settings,options,copyProtect}')::boolean,
-    loq_contents
+    to_jsonb(loq_contents#>>'{settings,thumbnail}'),
+    loq_contents,
+    NOW()
   )
 returning id into new_id;
 return new_id;
@@ -109,14 +114,14 @@ set title = loq_contents#>>'{settings,title}',
   quiz_description = loq_contents#>>'{settings,description}',
   visibility = (loq_contents#>>'{settings,options,visibility}')::public.visibility,
   copy_protect = (loq_contents#>>'{settings,options,copyProtect}')::boolean,
-  contents = loq_contents
-where id = loq_id returning id into new_id;
-if new_id is null then
-  raise exception sqlstate '90102' using message = 'No such loq found for update.';
+  thumbnail = (to_jsonb(loq_contents#>>'{settings,thumbnail}')),
+  contents = loq_contents,
+  last_updated = NOW()
+where id = loq_id
+returning id into new_id;
+if new_id is null then raise exception sqlstate '90102' using message = 'No such loq found for update.';
 end if;
-
 return new_id;
-
 end if;
 end;
 $$ language plpgsql security definer;
