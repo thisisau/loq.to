@@ -1,26 +1,31 @@
 .table {
   padding: 0;
   border-spacing: 0;
-  display: table;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .table .header {
-  display: table-header-group;
-  vertical-align: middle;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--section-background-hover);
 }
 
 .table .body {
-  display: table-row-group;
-  vertical-align: middle;
+  display: flex;
+  flex-direction: column;
 }
 
 .table .row {
-  display: table-row;
+  display: flex;
+  flex-direction: row;
 }
 
 .table .cell {
-  display: table-cell;
   padding: 8px;
+  display: flex;
+  align-items: center;
 }
 
 .table .cell:not(:first-child) {
@@ -29,6 +34,13 @@
 
 .table .body .cell {
   border-top: 1px solid var(--section-border);
+}
+
+.table .cell,
+.table .cell * {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .table .link {

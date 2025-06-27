@@ -1,7 +1,26 @@
 #content.saved .table {
-  min-width: min(100%, 768px);
+  width: min(calc(100% - 50px), 768px);
+  margin-left: 24px;
+  margin-right: 24px;
+  overflow-x: auto;
 }
 
-#content.saved .table {
-  min-width: min(100%, 768px);
+#content.saved .table .cell img {
+  max-height: 48px;
+  max-width: 48px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+#content.saved .table .cell .icon {
+  display: flex;
+}
+
+#content.saved .table .cell .icon img {
+  filter: var(--accent-icon-filter);
+  height: 24px;
+}
+
+#content.saved .table .body .cell:first-child span {
+  display: flex;
 }

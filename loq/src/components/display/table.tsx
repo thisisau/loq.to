@@ -8,12 +8,14 @@ export default function Table<T extends string>(
       [id in T]: {
         display: ReactNode;
         style: CSSProperties;
+        headerStyle?: CSSProperties;
       };
     };
     getCell: (row: number, column: T, columnNumber: number) => ReactNode;
     rows: number;
     className?: string;
     changeBackgroundOnHover?: "row" | "cell" | "none";
+    rowStyle?: CSSProperties;
   } & (
     | {
         getCellLink?: (
@@ -35,15 +37,18 @@ export default function Table<T extends string>(
       role="table"
     >
       <div className="header" role="rowheader">
-        <div className="row" role="row">
+        <div className="row" role="row" style={props.rowStyle}>
           {(Object.keys(props.columns) as T[]).map((e, i) => (
             <div
               className="cell"
               key={i}
-              style={props.columns[e].style}
+              style={{
+                ...props.columns[e].style,
+                ...props.columns[e].headerStyle,
+              }}
               role="cell"
             >
-              {props.columns[e].display}
+              <span> {props.columns[e].display} </span>
             </div>
           ))}
         </div>
@@ -68,7 +73,9 @@ export default function Table<T extends string>(
                     key={columnNumber}
                     style={props.columns[columnName].style}
                   >
-                    {props.getCell(rowNumber, columnName, columnNumber)}
+                    <span>
+                      {props.getCell(rowNumber, columnName, columnNumber)}
+                    </span>
                   </div>
                 );
 
@@ -84,7 +91,10 @@ export default function Table<T extends string>(
                   role="cell"
                   to={link}
                 >
-                  {props.getCell(rowNumber, columnName, columnNumber)}
+                  <span>
+                    {" "}
+                    {props.getCell(rowNumber, columnName, columnNumber)}
+                  </span>
                 </Link>
               );
             }
@@ -101,6 +111,7 @@ export default function Table<T extends string>(
                 )}
                 key={rowNumber}
                 role="row"
+                style={props.rowStyle}
               >
                 {rowContents}
               </div>
@@ -115,6 +126,7 @@ export default function Table<T extends string>(
               key={rowNumber}
               role="row"
               to={link}
+              style={props.rowStyle}
             >
               {rowContents}
             </Link>

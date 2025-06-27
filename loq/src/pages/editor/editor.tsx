@@ -43,8 +43,8 @@ import Notification from "../../components/page/notification/notification";
 import { AnimatePresence, motion } from "motion/react";
 import supabase from "../../supabase/client";
 import { useUserInfo } from "../../functions/userInfo";
-import { fetchLOQ } from "../../functions/database";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { fetchLOQ, getImageURL } from "../../functions/database";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const questionTypes: Array<{ type: QuestionType; display: string }> = [
   {
@@ -1369,10 +1369,6 @@ function YoutubeLinkInputModal(props: { onSubmit: (id: string) => void }) {
 
 function ImageManager(props: { onSubmit: (image: Image) => void }) {
   return <Modal title="Image Manager">Coming soon!</Modal>;
-}
-
-function getImageURL(image: Image): string {
-  return "";
 }
 
 function getVideoURL(video: Video, embed: boolean): string {

@@ -1,4 +1,4 @@
-import { Contents } from "../pages/editor/editor.types";
+import { Contents, Image } from "../pages/editor/editor.types";
 import supabase from "../supabase/client";
 
 export async function fetchLOQ(id: string | number) {
@@ -21,4 +21,8 @@ export async function fetchLOQ(id: string | number) {
     };
   }
   return { data: null, error };
+}
+
+export function getImageURL(image: Image, fallback: string = "/assets/tiles/purple.png"): string {
+  return fallback;
 }
