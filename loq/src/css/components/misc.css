@@ -64,10 +64,15 @@ a:hover {
   border-radius: 12px;
   transition: backdrop-filter 200ms ease;
   padding: 8px;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
+}
+
+button.button-icon-container {
+  width: 64px;
+  height: 64px;
 }
 
 .button-icon-container img {

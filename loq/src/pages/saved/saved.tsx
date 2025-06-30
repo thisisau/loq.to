@@ -24,6 +24,11 @@ export default function Saved() {
       <Suspense fallback={<FullscreenLoader />}>
         <SavedContent page={0} count={10} />
       </Suspense>
+      <title>Saved LOQs - loq.to</title>
+      <meta
+        name="description"
+        content={`View, share, and fine-tune all of your loq quizzes on loq.to!`}
+      />
     </Layout>
   );
 }
@@ -134,7 +139,7 @@ function SavedContent(props: { page: number; count: number }) {
               return <img src={getImageURL(data[row].thumbnail as Image)} />;
           }
         }}
-        getRowLink={(row) => `/editor/${data[row].id}`}
+        getRowLink={(row) => `/view/${data[row].id}`}
         changeBackgroundOnHover="row"
       />
       <div className="vertical-margin">

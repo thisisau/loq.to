@@ -18,3 +18,5 @@ export type ResponseError = {
   id: string;
   message: string;
 };
+
+export type MaybePromise<T> = T | Promise<T>

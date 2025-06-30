@@ -69,7 +69,7 @@ export type Database = {
           quiz_description: string
           thumbnail: Json | null
           title: string
-          visibility: Database["public"]["Enums"]["visibility"] | null
+          visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
           author?: string | null
@@ -84,7 +84,7 @@ export type Database = {
           quiz_description?: string
           thumbnail?: Json | null
           title?: string
-          visibility?: Database["public"]["Enums"]["visibility"] | null
+          visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
           author?: string | null
@@ -99,7 +99,7 @@ export type Database = {
           quiz_description?: string
           thumbnail?: Json | null
           title?: string
-          visibility?: Database["public"]["Enums"]["visibility"] | null
+          visibility?: Database["public"]["Enums"]["visibility"]
         }
         Relationships: [
           {
@@ -116,11 +116,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_quiz: {
+        Args: {
+          loq_id: number
+        }
+        Returns: undefined
+      }
       generate_username_from_email: {
         Args: {
           email: string
         }
         Returns: string
+      }
+      get_user_info: {
+        Args: {
+          user_id: string
+        }
+        Returns: Json
       }
       update_username: {
         Args: {

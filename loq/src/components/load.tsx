@@ -12,9 +12,7 @@ declare module "react" {
     }
   }
 }
-export function Loader(props: {
-  children?: ReactNode
-}) {
+export function Loader(props: { children?: ReactNode }) {
   return (
     <div className="loader-container">
       <l-treadmill color="white" />
@@ -24,7 +22,9 @@ export function Loader(props: {
 }
 
 export function FullscreenLoader() {
-  return <div className="loading">
-          <Loader />
-        </div>;
+  return (
+    <div className="loading">
+      <Loader />
+    </div>
+  );
 }

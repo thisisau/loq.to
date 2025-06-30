@@ -81,6 +81,7 @@ export default function Table<T extends string>(
 
               return (
                 <Link
+                  draggable={false}
                   className={concatClasses(
                     "cell link",
                     props.changeBackgroundOnHover === "cell" &&
@@ -119,6 +120,7 @@ export default function Table<T extends string>(
 
           return (
             <Link
+              draggable={false}
               className={concatClasses(
                 "row link",
                 props.changeBackgroundOnHover === "row" && "hover-animation"

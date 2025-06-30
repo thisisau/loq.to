@@ -51,6 +51,11 @@ export default function Login() {
           <GenericForm />
         </div>
       </div>
+      <title>{`Log In - loq.to`}</title>
+      <meta
+        name="description"
+        content={`Create or log in to your loq.to account.`}
+      />
     </Layout>
   );
 }
@@ -322,7 +327,7 @@ const VerifyEmail = () => {
                 e.preventDefault();
                 const alert = addAlert(
                   <Modal title="Verification">
-                    Sending a code to {state.email}...
+                    Sending a code to {state.email}…
                   </Modal>
                 );
                 const { error } = await supabase.auth.signInWithOtp({
@@ -375,7 +380,7 @@ const AccountInfo = () => {
           Your username will be publicly visible on your profile.
         </div>
         <TextInput
-          placeholder="Add a username..."
+          placeholder="Add a username…"
           textAlign="center"
           defaultValue={credentials.username}
           onUpdate={(e) => updateCredentials((value) => (value.username = e))}

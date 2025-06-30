@@ -24,6 +24,7 @@ import Editor from "./pages/editor/editor";
 import NotificationProvider from "./components/page/notification/provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Saved from "./pages/saved/saved";
+import Viewer from "./pages/saved/view";
 
 function App() {
   const alertHandler = useRef(new AlertHandler());
@@ -41,6 +42,7 @@ function App() {
               <Route path="account" element={<UserProfile />} />
               <Route path="editor/:id?" element={<Editor />} />
               <Route path="saved" element={<Saved />} />
+              <Route path="view/:id" element={<Viewer />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

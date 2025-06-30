@@ -1,5 +1,7 @@
+import type { UUID } from "crypto";
+
 export type LOQ = {
-  id: string;
+  id: number;
   title: string;
   description: string;
   contents: Contents;
@@ -10,7 +12,8 @@ export type LOQ = {
   lastUsed: Date | null;
   visibility: Visibility;
   copyProtect: boolean;
-  author: string;
+  author: UUID;
+  thumbnail: Image | null;
 };
 
 export type Contents = {

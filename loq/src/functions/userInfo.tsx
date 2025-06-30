@@ -2,12 +2,16 @@ import { cache, useEffect, useState } from "react";
 import { Database } from "../supabase/database.types";
 import supabase from "../supabase/client";
 
-export type UserInfo = {
-  displayName: string | null;
-  id: string;
+export type UserInfo = PublicUserInfo & {
   lastUpdated: Date;
-  username: string;
 };
+
+export type PublicUserInfo = {
+    displayName: string | null;
+  id: string;
+
+  username: string;
+}
 
 const cachedInfo: {
   value: UserInfo | null;

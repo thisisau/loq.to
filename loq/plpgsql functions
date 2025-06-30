@@ -125,3 +125,44 @@ return new_id;
 end if;
 end;
 $$ language plpgsql security definer;
+-- Get user info function
+create or replace function get_user_info (user_id uuid) returns json
+set search_path = '' language sql security definer as $$
+select coalesce(
+    (
+      select json_build_object(
+          'id',
+          id,
+          'display_name',
+          display_name,
+          'username',
+          username
+        )
+      FROM public.profiles
+      where id = user_id
+    ),
+    json_build_object(
+      'id',
+      user_id,
+      'display_name',
+      'Unknown User',
+      'username',
+      'deleted'
+    )
+  ) $$;
+-- Delete loq function
+create or replace function delete_quiz (loq_id int8) returns void
+set search_path = '' as $$
+BEGIN
+  IF not exists(
+    select 1
+    from public.quizzes
+    where author = auth.uid()
+      and id = loq_id
+  ) then
+    raise exception sqlstate '90103' using message = 'You are not the owner of this loq.';
+  end if;
+  delete from public.quizzes where id = loq_id;
+end;
+$$
+language plpgsql security definer;

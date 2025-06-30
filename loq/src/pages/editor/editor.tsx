@@ -43,10 +43,10 @@ import Notification from "../../components/page/notification/notification";
 import { AnimatePresence, motion } from "motion/react";
 import supabase from "../../supabase/client";
 import { useUserInfo } from "../../functions/userInfo";
-import { fetchLOQ, getImageURL } from "../../functions/database";
+import { fetchLOQContents, getImageURL } from "../../functions/database";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-const questionTypes: Array<{ type: QuestionType; display: string }> = [
+export const questionTypes: Array<{ type: QuestionType; display: string }> = [
   {
     type: "multiple-choice",
     display: "Multiple Choice",
@@ -153,20 +153,23 @@ function EditorContent() {
   const navigate = useNavigate();
 
   const { data } = useSuspenseQuery({
-    queryKey: ["public", "quizzes", "id", id],
-    queryFn: () => fetchLOQ(id ?? NaN),
+    queryKey: ["public", "quizzes", "id", id, "contents"],
+    queryFn: () => fetchLOQContents(id ?? NaN),
   }).data;
 
   useEffect(() => {
-    if (data === null && id !== null) {
-      addNotification(
-        <Notification title="Error" time={4000}>
-          A loq with ID {id} could not be found.
-        </Notification>
-      );
+    if (data === null) {
+      if (id !== null)
+        addNotification(
+          <Notification title="Error" time={4000}>
+            A loq with ID {id} could not be found.
+          </Notification>
+        );
       navigate("/editor");
     }
   }, []);
+
+  console.log(data);
 
   return <Editor initialContents={data ?? getEmptyLOQ()} />;
 }
@@ -289,8 +292,8 @@ function EditorSidebar() {
             else return;
             const id = isNaN(Number(params.id)) ? -1 : Number(params.id);
             addNotification(
-              <Notification title="Uploading..." time={4000}>
-                Saving your loq...
+              <Notification title="Uploading…" time={4000}>
+                Saving your loq…
               </Notification>
             );
             const { error } = await uploadLOQ(id, quiz);
@@ -353,8 +356,8 @@ function EditorSidebar() {
             }
             const id = isNaN(Number(params.id)) ? -1 : Number(params.id);
             addNotification(
-              <Notification title="Uploading..." time={4000}>
-                Saving your loq...
+              <Notification title="Uploading…" time={4000}>
+                Saving your loq…
               </Notification>
             );
             const { data, error } = await uploadLOQ(id, quiz);
@@ -1351,7 +1354,7 @@ function YoutubeLinkInputModal(props: { onSubmit: (id: string) => void }) {
           <TextInput
             defaultValue={url}
             onUpdate={(val) => setURL(val)}
-            placeholder="Add a YouTube URL..."
+            placeholder="Add a YouTube URL…"
           />
           <Button
             className={concatClasses(videoID === null && "no-access")}

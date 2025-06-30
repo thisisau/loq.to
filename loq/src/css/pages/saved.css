@@ -24,3 +24,126 @@
 #content.saved .table .body .cell:first-child span {
   display: flex;
 }
+
+#content.viewer {
+  gap: 8px;
+}
+
+#content.viewer>.actions {
+  display: flex;
+  flex-direction: row;
+  flex-basis: 64px;
+  gap: 8px;
+}
+
+#content.viewer .questions-list {
+  display: flex;
+  flex-direction: column;
+  width: min(calc(100% - 24px), 720px);
+  gap: 16px;
+  margin-bottom: 96px;
+}
+
+#content.viewer .questions-list>div {
+  display: flex;
+  flex-direction: column;
+}
+
+#content.viewer .questions-list>div.selected .title {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#content.viewer .questions-list>div .body {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: none;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+#content.viewer .questions-list .title {
+  padding: 16px;
+  color: var(--main-text-color);
+  font-size: 18pt;
+  text-align: left;
+  /* width: 100%; */
+  transition: background-color ease 200ms, border-radius ease 200ms;
+}
+
+#content.viewer .questions-list :not(.selected) .title {
+  cursor: pointer;
+}
+
+#content.viewer .questions-list :not(.selected) .title:hover {
+  background-color: var(--section-background-hover);
+}
+
+#content.viewer .questions-list .description {
+  text-align: center;
+}
+
+#content.viewer .questions-list .details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#content.viewer .questions-list .description ~ .details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--section-border);
+}
+
+#content.viewer .questions-list .details>.properties {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#content.viewer .questions-list .details>.properties>* {
+  text-align: center;
+}
+
+#content.viewer .questions-list .details>.answers {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-wrap: wrap;
+  /* margin-bottom:16px; */
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--section-border);
+}
+
+#content.viewer .questions-list .details>.answers>div {
+  flex: 1 0 calc(50% - 26px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 96px;
+  gap: 16px;
+}
+
+#content.viewer .questions-list .details>.answers>div span {
+  text-align: center;
+  flex-grow: 1;
+  padding-right: 36px;
+  word-wrap: break-word;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+#content.viewer .questions-list .details>.answers>div .icon-container {
+  border-color: var(--main-text-color);
+  background-color: transparent;
+  padding: 6px;
+  height: 36px;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+#content.viewer .questions-list .details>.answers>div img {
+  filter: var(--accent-icon-filter);
+  height: 100%;
+  width: 100%;
+}

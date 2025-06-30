@@ -55,3 +55,21 @@
 .table .hover-animation:hover {
   background-color: var(--section-background-hover);
 }
+
+.dual-column {
+  display: flex;
+  flex-direction: row;
+}
+
+.dual-column > span {
+  text-align: center;
+}
+
+.dual-column > :first-child {
+  padding-right: 15px;
+  border-right: 1px solid var(--section-border);
+}
+
+.dual-column > :last-child {
+  padding-left: 16px;
+}
