@@ -41,13 +41,30 @@ export function useAddAlert(): (
         clearAlert: () => void,
         replaceAlert: (newContent: ReactNode) => void
       ) => ReactNode)
-) => UUID {
+) => {
+  id: UUID;
+  // clearAlert: () => void;
+  // replaceAlert: (newContent: ReactNode) => void;
+} {
   const alertHandler = useAlertHandler();
   const thisAlertKey = useRef<string | undefined>(undefined);
   return (alert) => {
+    const returnValue = (id: UUID) => {
+      return {
+        id,
+        clearAlert: () => {
+          if (thisAlertKey.current)
+            alertHandler.removeAlert(thisAlertKey.current);
+        },
+        replaceAlert: (newContent: ReactNode) => {
+          if (thisAlertKey.current)
+            alertHandler.replaceAlert(thisAlertKey.current, newContent);
+        },
+      };
+    };
     if (typeof alert !== "function") {
       const id = alertHandler.addAlert(alert);
-      return id;
+      return returnValue(id);
     }
 
     const alertElement = alert(
@@ -65,7 +82,7 @@ export function useAddAlert(): (
 
     thisAlertKey.current = id;
 
-    return id;
+    return returnValue(id);
   };
 }
 

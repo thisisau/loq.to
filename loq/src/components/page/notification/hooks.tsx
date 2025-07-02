@@ -1,4 +1,4 @@
-import { createContext, ReactNode, RefObject, useContext, useRef } from "react";
+import { createContext, ReactNode, RefObject, useContext } from "react";
 import type { UUID } from "crypto";
 import { useAddAlert } from "../../alerts/alert_hooks";
 
@@ -27,7 +27,7 @@ export function useAddNotification(): (
 
   return (notification) => {
     const alert = addAlert(notification);
-    notifications.current.notifications.push({ id: alert });
-    return alert;
+    notifications.current.notifications.push({id: alert.id});
+    return alert.id;
   };
 }

@@ -128,3 +128,30 @@ export function formatDate(
       }`;
   }
 }
+
+export function blurActiveElement() {
+  if (
+    document.activeElement &&
+    "blur" in document.activeElement &&
+    typeof document.activeElement.blur === "function"
+  )
+    document.activeElement.blur();
+}
+
+export function splitArrayIntoChunks<T>(array: Array<T>, options: {
+  chunkSize: number
+} | {
+  chunkCount: number
+}) {
+  const splitArray: Array<Array<T>> = [];
+  const chunkSize = 'chunkSize' in options ? options.chunkSize : Math.ceil(array.length / options.chunkCount);
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const arrayChunk = [];
+    for (let j = 0; j < chunkSize; j++) {
+      if (i + j >= array.length) break;
+      arrayChunk.push(array[i + j]);
+    }
+    splitArray.push(arrayChunk);
+  }
+  return splitArray;
+}

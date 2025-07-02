@@ -34,6 +34,7 @@
   flex-direction: row;
   flex-basis: 64px;
   gap: 8px;
+  margin: 48px 0;
 }
 
 #content.viewer .questions-list {
@@ -89,7 +90,7 @@
   gap: 16px;
 }
 
-#content.viewer .questions-list .description ~ .details {
+#content.viewer .questions-list .description~.details {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--section-border);

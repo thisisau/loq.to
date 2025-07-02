@@ -1,6 +1,7 @@
-import { MaybePromise } from "../../functions/types";
+import { motion } from "motion/react";
 import { useClearAlert } from "../alerts/alert_hooks";
 import Button from "../input/button";
+import { Loader } from "../load";
 
 export type ModalProps = {
   title: string;
@@ -55,6 +56,22 @@ export function Modal(props: ModalProps) {
         <div className="modal-content">{props.children}</div>
       </div>
     </div>
+  );
+}
+
+export function LoaderModal() {
+  return (
+    <motion.div className="modal" initial={{
+      opacity: 0
+    }} animate={{
+      opacity: 1,
+      transition: {
+        duration: .2,
+        ease: "easeOut"
+      }
+    }}>
+      <Loader />
+    </motion.div>
   );
 }
 

@@ -325,24 +325,23 @@ const VerifyEmail = () => {
               href="#"
               onClick={async (e) => {
                 e.preventDefault();
-                const alert = addAlert(
+                const {id} = addAlert(
                   <Modal title="Verification">
                     Sending a code to {state.email}…
                   </Modal>
                 );
                 const { error } = await supabase.auth.signInWithOtp({
                   email: state.email,
-                });
+                }).catch(e => {console.log("ERRORRRR", e); return e})
+
                 if (error === null)
-                  alertHandler.replaceAlert(
-                    alert,
+                  alertHandler.replaceAlert(id, 
                     <Modal title="Verification">
                       A verification code has been sent to {state.email}!
                     </Modal>
                   );
                 else
-                  alertHandler.replaceAlert(
-                    alert,
+                  alertHandler.replaceAlert(id,
                     <Modal title="Verification">
                       An error occurred: {error.message}
                     </Modal>

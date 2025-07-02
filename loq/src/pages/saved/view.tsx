@@ -59,8 +59,19 @@ function ViewerContent() {
 
   const loq = data.contents;
 
+  // Workaround since the <title> tag doesn't work consistently
+  document.title = `${data.title} - loq.to`
+
   return (
     <>
+      <title>{data.title} - loq.to</title>
+      <meta
+        name="description"
+        content={`View, play, and share ${loq.settings.title} on loq.to${
+          loq.settings.description ? `: ${loq.settings.description}` : ""
+        }.${loq.questions.map((e, i) => ` ${i + 1}. ${e.title}`)}
+        `.substring(0, 150)}
+      />
       <h1>{loq.settings.title}</h1>
       <span>
         By <Username id={data?.author ?? "----"} />
@@ -158,14 +169,6 @@ function ViewerContent() {
         />
       </div>
       <LOQViewer contents={loq} />
-      <title>{loq.settings.title} - loq.to</title>
-      <meta
-        name="description"
-        content={`View, play, and share ${loq.settings.title} on loq.to${
-          loq.settings.description ? `: ${loq.settings.description}` : ""
-        }.${loq.questions.map((e, i) => ` ${i + 1}. ${e.title}`)}
-        `.substring(0, 150)}
-      />
     </>
   );
 }

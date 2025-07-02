@@ -34,6 +34,88 @@ export type Database = {
   }
   public: {
     Tables: {
+      live_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          game: string
+          id: string
+          payload: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          game: string
+          id?: string
+          payload?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          game?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_events_game_fkey"
+            columns: ["game"]
+            isOneToOne: false
+            referencedRelation: "live_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_games: {
+        Row: {
+          contents: Json
+          created_at: string
+          host: string
+          id: string
+          last_updated: string
+        }
+        Insert: {
+          contents: Json
+          created_at?: string
+          host?: string
+          id?: string
+          last_updated?: string
+        }
+        Update: {
+          contents?: Json
+          created_at?: string
+          host?: string
+          id?: string
+          last_updated?: string
+        }
+        Relationships: []
+      }
+      live_rooms: {
+        Row: {
+          code: string
+          id: string
+        }
+        Insert: {
+          code: string
+          id: string
+        }
+        Update: {
+          code?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_rooms_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "live_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           display_name: string | null
@@ -131,6 +213,27 @@ export type Database = {
       get_user_info: {
         Args: {
           user_id: string
+        }
+        Returns: Json
+      }
+      live_create_room: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      live_generate_room_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      live_get_room_id: {
+        Args: {
+          room_code: string
+        }
+        Returns: string
+      }
+      live_join_room: {
+        Args: {
+          display_name: string
+          room_id: string
         }
         Returns: Json
       }
