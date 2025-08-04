@@ -20,22 +20,19 @@ import {
   PaginateContainer,
   usePaginate,
 } from "../../../components/paginate/paginate";
-import { Contents, Question as LOQQuestion } from "../../editor/editor.types";
+import { Contents } from "../../editor/editor.types";
 import type { UUID } from "crypto";
 import { Confirm, LoaderModal, Modal } from "../../../components/page/modal";
 import {
   useAddAlert,
   useAlertHandler,
 } from "../../../components/alerts/alert_hooks";
-import { Database } from "../../../supabase/database.types";
 import {
   concatClasses,
   fadeAudioOut,
   plural,
   shuffle,
   splitArrayIntoChunks,
-  testOrderedArrayEquality,
-  testUnorderedArrayEquality,
 } from "../../../functions/functions";
 import { createContext } from "react";
 import {
@@ -806,7 +803,7 @@ function UserAnswersGrid() {
           chunkCount: 3,
         }).map((rowValues, rowIndex) => (
           <div key={rowIndex}>
-            {rowValues.map((cell, cellIndex) => {
+            {rowValues.map((cell) => {
               const index = orderedAnswers.findIndex((val) => val === cell);
               if (!("userAnswers" in game.game.status)) throw new Error();
 
@@ -953,7 +950,7 @@ function AnswersGrid() {
         chunkCount: 3,
       }).map((rowValues, rowIndex) => (
         <div key={rowIndex}>
-          {rowValues.map((cell, cellIndex) => {
+          {rowValues.map((cell) => {
             if (!("userAnswers" in game.game.status)) throw new Error();
             const index = orderedAnswers.findIndex((val) => val === cell);
 
@@ -1075,80 +1072,4 @@ function GameFooter(props: { accent?: boolean }) {
       </div>
     </div>
   );
-}
-function answerIsCorrect(
-  currentQuestion: LOQQuestion,
-  answerPayload: { answer: string | Array<number> | number },
-  answerOrder: Array<number>
-): boolean {
-  // Validate answer
-  switch (currentQuestion.questionType) {
-    case "multiple-choice":
-    case "true-false":
-      if (typeof answerPayload.answer !== "number") return false;
-      break;
-    case "arrange":
-    case "multi-select":
-      if (!(answerPayload.answer instanceof Array)) return false;
-      for (let i = 0; i < answerPayload.answer.length; i++) {
-        if (i >= currentQuestion.answers.length || typeof i !== "number")
-          return false;
-      }
-      break;
-    case "open-ended":
-      if (
-        typeof answerPayload.answer !== "string" ||
-        answerPayload.answer.length > 100
-      )
-        return false;
-      break;
-  }
-
-  if (currentQuestion.questionType === "open-ended") {
-    let userTextAnswer = answerPayload.answer as string;
-    userTextAnswer = userTextAnswer.trim().normalize();
-    if (!currentQuestion.options.caseSensitive)
-      userTextAnswer = userTextAnswer.toLowerCase();
-    return currentQuestion.answers
-      .map((answer) => {
-        let text = answer.text;
-        text = text.trim().normalize();
-        if (!currentQuestion.options.caseSensitive) text = text.toLowerCase();
-        return text;
-      })
-      .includes(userTextAnswer);
-  }
-
-  // Unshuffle user answers
-  let userAnswer = answerPayload.answer as number[] | number;
-
-  if (typeof userAnswer === "number") {
-    userAnswer = answerOrder[userAnswer];
-  } else {
-    userAnswer = userAnswer.map((e) => answerOrder[e]);
-  }
-
-  // Test if answer is correct
-  switch (currentQuestion.questionType) {
-    case "multiple-choice":
-    case "true-false":
-      return currentQuestion.answers[userAnswer as number].correct;
-    case "multi-select":
-      return testUnorderedArrayEquality(
-        userAnswer as number[],
-        currentQuestion.answers
-          .map((e, i) => {
-            return { index: i, correct: e.correct };
-          })
-          .filter((e) => e.correct)
-          .map((e) => e.index)
-      );
-    case "arrange":
-      return testOrderedArrayEquality(
-        userAnswer as number[],
-        Array.apply(null, new Array(currentQuestion.answers.length)).map(
-          (_, i) => i
-        )
-      );
-  }
 }

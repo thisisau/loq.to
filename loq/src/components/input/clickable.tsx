@@ -9,7 +9,6 @@ import {
 } from "react";
 import { useMutableState } from "../../functions/hooks";
 import { concatClasses } from "../../functions/functions";
-import { defaultValueTypes } from "motion";
 
 export function ClickableInputGroup(
   props: {
