@@ -45,7 +45,7 @@ export default function Home() {
               Have an account? Click here to log in.
             </Card>
             <Card title="Editor Demo" link="/editor">
-              Not committed? Try our state-of-the-art editor without an account!
+              Not committed? Try our awesome editor without an account!
             </Card>
           </>
         )}
@@ -65,8 +65,14 @@ export default function Home() {
                 e.preventDefault();
                 addAlert(
                   <Modal title="Contact">
-                    For inquiries, email{" "}
-                    <Link to="mailto:support@loq.to">support @ loq . to</Link>
+                    <span>
+                      For inquiries and support, email
+                      <br />
+                      <a href="mailto:support@loq.to">
+                        support&#8203;@&#8203;loq&#8203;.to
+                      </a>
+                      .
+                    </span>
                   </Modal>
                 );
               }}

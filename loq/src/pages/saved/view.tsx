@@ -3,17 +3,10 @@ import Layout from "../../components/page/layout";
 import { FullscreenLoader } from "../../components/load";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  fetchLOQ,
-  getImageURL,
-  getVideoURL,
-} from "../../functions/database";
+import { fetchLOQ, getImageURL, getVideoURL } from "../../functions/database";
 import { Username } from "../../components/display/user";
 import { DualColumn } from "../../components/display/format";
-import {
-  concatClasses,
-  formatDate,
-} from "../../functions/functions";
+import { concatClasses, formatDate } from "../../functions/functions";
 import {
   ButtonIconWithTooltip,
   ElementWithTooltip,
@@ -237,10 +230,12 @@ function LOQViewer(props: { contents: Contents }) {
                   )}
                   {currentQuestion.media &&
                     (currentQuestion.media.type === "image" ? (
-                      <img
-                        className="media-image"
-                        src={getImageURL(currentQuestion.media.data)}
-                      />
+                      <div className="media-image-container">
+                        <img
+                          className="media-image"
+                          src={getImageURL(currentQuestion.media.data)}
+                        />
+                      </div>
                     ) : (
                       <div className="media-video-container">
                         <iframe
