@@ -93,7 +93,7 @@
   }
 
   .login-container {
-    width: calc(100% - 0px);
+    width: calc(100% - 2px);
     max-height: calc(100% - 50px);
     border-radius: 0;
   }
