@@ -35,7 +35,13 @@ export type Settings = {
 export type Image = {
   type: "upload";
   path: ImagePath;
+} | {
+  type: "stock";
+  provider: StockProvider;
+  path: ImagePath;
 };
+
+export type StockProvider = "unsplash";
 
 export type Video = {
   provider: "youtube";
@@ -44,8 +50,10 @@ export type Video = {
 };
 
 export type ImagePath = {
-  uuid: string;
+  bucket: string;
+  path: string[];
   fileName: string;
+  id: number;
 };
 
 export type Visibility = "private" | "unlisted" | "public";

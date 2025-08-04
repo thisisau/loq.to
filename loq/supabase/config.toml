@@ -16,6 +16,7 @@ extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
+# jwt_secret = "env(JWT_SECRET)"
 
 [api.tls]
 enabled = false
@@ -51,6 +52,7 @@ sql_paths = ['./seed.sql']
 
 [realtime]
 enabled = true
+# jwt_secret = "env(API_JWT_SECRET)"
 # Bind realtime via either IPv4 or IPv6. (default: IPv4)
 # ip_version = "IPv6"
 # The maximum length in bytes of HTTP request headers. (default: 4096)
@@ -158,6 +160,10 @@ content_path = "./supabase/templates/email_confirmation.html"
 [auth.email.template.recovery]
 subject = "Reset Your Password"
 content_path = "./supabase/templates/email_recovery.html"
+
+[auth.email.template.magic_link]
+subject = "Your Email Confirmation Code"
+content_path = "./supabase/templates/email_confirmation.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

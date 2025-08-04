@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
 
 import Layout from "../../components/page/layout";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { TextInput } from "../../components/input/text";
 import Button from "../../components/input/button";
 import { Link } from "react-router-dom";
@@ -67,6 +67,17 @@ const LoginForm = () => {
     password: "",
   });
   const [errorContent, setErrorContent] = useState<ReactNode>(null);
+
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get("page");
+    if (page === "username") {
+      setPage("accountInfo", {email: ""})
+    } else if (page === "signup") {
+      setPage("signup", undefined);
+    }
+  }, [])
+
 
   return (
     <>
@@ -202,6 +213,7 @@ const SignupForm = () => {
           Continue
         </Button>
         <span className="login-error">{errorContent}</span>
+        <span style={{textAlign: "center"}}>By continuing, you agree to our <Link to="/terms" target="_blank">Terms of Service</Link> and <Link to="/privacy" target="_blank">Privacy Policy</Link>.</span>
       </div>
       <div className="login-form-footer">
         <div>
@@ -332,7 +344,7 @@ const VerifyEmail = () => {
                 );
                 const { error } = await supabase.auth.signInWithOtp({
                   email: state.email,
-                }).catch(e => {console.log("ERRORRRR", e); return e})
+                }).catch(e => e)
 
                 if (error === null)
                   alertHandler.replaceAlert(id, 
@@ -680,7 +692,8 @@ export type LoginFormPages = {
 };
 
 function GenericForm() {
-  return (
+
+ return (
     <PaginateContainer<LoginFormPages, "login">
       pages={{
         signup: <SignupForm />,

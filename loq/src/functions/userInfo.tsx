@@ -1,9 +1,9 @@
-import { cache, useEffect, useState } from "react";
-import { Database } from "../supabase/database.types";
+import { useEffect, useState } from "react";
 import supabase from "../supabase/client";
 
 export type UserInfo = PublicUserInfo & {
   lastUpdated: Date;
+  loggedIn: boolean;
 };
 
 export type PublicUserInfo = {
@@ -22,6 +22,7 @@ export const defaultInfo: UserInfo = {
   id: "",
   username: "deleted",
   lastUpdated: new Date(),
+  loggedIn: false
 };
 
 export function useUserInfo() {
@@ -47,7 +48,8 @@ export function useUserInfo() {
             if (error || data.length < 1) {
               console.error(
                 "An error occured when trying to fetch the user profile: ",
-                error
+                error,
+                "Data is: ", data
               );
               cachedInfo.value = null;
               return;
@@ -57,6 +59,7 @@ export function useUserInfo() {
               id: data[0].id,
               lastUpdated: new Date(data[0].last_updated),
               username: data[0].username,
+              loggedIn: true
             };
             cachedInfo.value = newInfo;
             setInfo(newInfo);
@@ -98,6 +101,7 @@ export async function asyncGetUserInfo() {
     id: data[0].id,
     lastUpdated: new Date(data[0].last_updated),
     username: data[0].username,
+    loggedIn: true
   };
   cachedInfo.value = newInfo;
   return newInfo;

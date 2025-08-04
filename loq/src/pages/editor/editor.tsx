@@ -9,17 +9,16 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Contents,
-  Image,
+  type Image,
   MultipleChoiceAnswer,
   OpenEndedAnswer,
   Question,
   QuestionType,
   TextImageAnswerContent,
   TrueFalseAnswer,
-  Video,
 } from "./editor.types";
 
-import { FullscreenLoader } from "../../components/load";
+import { FullscreenLoader, Loader } from "../../components/load";
 import { useMutableState } from "../../functions/hooks";
 import Layout from "../../components/page/layout";
 import {
@@ -30,8 +29,12 @@ import { TextInput } from "../../components/input/text";
 import { Checkbox } from "../../components/input/clickable";
 import { DropdownInput } from "../../components/input/dropdown";
 import { FormItem, FormItemWithTitle } from "../../components/input/form";
-import { useAddAlert } from "../../components/alerts/alert_hooks";
-import { Modal } from "../../components/page/modal";
+import {
+  useAddAlert,
+  useAlertHandler,
+  useClearAlert,
+} from "../../components/alerts/alert_hooks";
+import { Confirm, Modal } from "../../components/page/modal";
 import {
   concatClasses,
   copyToClipboard,
@@ -43,8 +46,17 @@ import Notification from "../../components/page/notification/notification";
 import { AnimatePresence, motion } from "motion/react";
 import supabase from "../../supabase/client";
 import { useUserInfo } from "../../functions/userInfo";
-import { fetchLOQContents, getImageURL } from "../../functions/database";
+import {
+  fetchLOQContents,
+  getImageURL,
+  getVideoURL,
+} from "../../functions/database";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  PaginateContainer,
+  usePaginate,
+} from "../../components/paginate/paginate";
+import imageCompression, { Options } from "browser-image-compression";
 
 export const questionTypes: Array<{ type: QuestionType; display: string }> = [
   {
@@ -413,11 +425,17 @@ function EditorSidebar() {
           className="nav-button settings-button add-question-button"
           onClick={() => {
             updateQuiz((loq) => {
-              loq.questions.push(getEmptyQuestion());
+              if (page.mode === "settings")
+                loq.questions.push(getEmptyQuestion());
+              else
+                loq.questions.splice(page.question + 1, 0, getEmptyQuestion());
             });
             setPage({
               mode: "question",
-              question: quiz.questions.length,
+              question:
+                page.mode === "settings"
+                  ? quiz.questions.length
+                  : page.question + 1,
               unsavedChanges: page.unsavedChanges,
             });
           }}
@@ -463,6 +481,7 @@ function EditorSidebar() {
 function Settings() {
   const [quiz, updateQuiz] = useLOQ();
   const addAlert = useAddAlert();
+  const addNotification = useAddNotification();
   return (
     <div className="editor-content settings">
       <TextInput
@@ -499,20 +518,50 @@ function Settings() {
         textArea
       />
       <div className="question-image-upload section">
-        <ButtonIconWithTooltip
-          src="/icons/media-image-plus.svg"
-          tooltip="Add a thumbnail for this loq"
-          onClick={() =>
-            addAlert((clear) => (
-              <ImageManager
-                onSubmit={(image) => {
-                  updateQuiz((loq) => (loq.settings.thumbnail = image));
-                  clear();
+        {quiz.settings.thumbnail ? (
+          <>
+            <div className="media-preview">
+              <img src={getImageURL(quiz.settings.thumbnail)} />
+            </div>
+            <div className="controls">
+              <ButtonIconWithTooltip
+                src="/icons/xmark.svg"
+                tooltip={`Remove this ${quiz.settings.thumbnail.type}`}
+                onClick={() =>
+                  updateQuiz((loq) => (loq.settings.thumbnail = null))
+                }
+              />
+              <ButtonIconWithTooltip
+                src="/icons/copy.svg"
+                tooltip={`Copy media URL`}
+                onClick={async () => {
+                  const questionMedia = quiz.settings.thumbnail!;
+                  await copyToClipboard(getImageURL(questionMedia));
+                  addNotification(
+                    <Notification title="Notification" time={4000}>
+                      Copied link to clipboard!
+                    </Notification>
+                  );
                 }}
               />
-            ))
-          }
-        />
+            </div>
+          </>
+        ) : (
+          <ButtonIconWithTooltip
+            src="/icons/media-image-plus.svg"
+            tooltip="Add a thumbnail for this loq"
+            onClick={() =>
+              addAlert((clear) => (
+                <ImageManager
+                  onSubmit={(image) => {
+                    updateQuiz((loq) => (loq.settings.thumbnail = image));
+                    clear();
+                  }}
+                />
+              ))
+            }
+          />
+        )}
       </div>
       <div className="question-options section">
         <FormItem>
@@ -723,7 +772,7 @@ function Questions() {
         )}
       </div>
       <AnswerEditor />
-      <div className="question-options section">
+      <div className="question-options section" key={currentQuestion}>
         <FormItemWithTitle title="Question Type">
           <DropdownInput
             headAriaLabel="Question Type dropdown"
@@ -933,7 +982,7 @@ function AnswerEditor() {
       {quiz.questions[currentQuestion].answers.map((currentAnswer, index) => {
         return (
           <div
-            className="answer section"
+            className={concatClasses("answer section", "image" in currentAnswer && currentAnswer.image && "has-media")}
             style={{ backgroundColor: `var(--answer-${index % 12})` }}
             key={index}
           >
@@ -982,6 +1031,11 @@ function AnswerEditor() {
               />
             ) : (
               <div className="answer-input">{currentAnswer.text}</div>
+            )}
+            {"image" in currentAnswer && currentAnswer.image && (
+              <div className="answer-image-container">
+                <img src={getImageURL(currentAnswer.image)} />
+              </div>
             )}
           </div>
         );
@@ -1370,15 +1424,516 @@ function YoutubeLinkInputModal(props: { onSubmit: (id: string) => void }) {
   );
 }
 
-function ImageManager(props: { onSubmit: (image: Image) => void }) {
-  return <Modal title="Image Manager">Coming soon!</Modal>;
+export function ImageManager(props: { onSubmit: (image: Image) => void }) {
+  useEffect(() => {
+    (async () => {})();
+  }, []);
+
+  const clearAlert = useClearAlert();
+
+  const onSubmit = (image: Image) => {
+    console.log("running on submit");
+    clearAlert();
+    props.onSubmit(image);
+  };
+
+  return (
+    <Suspense
+      fallback={
+        <Modal title="Image Manager">
+          <Loader />
+        </Modal>
+      }
+    >
+      <ImageManagerContent onSubmit={onSubmit} />
+    </Suspense>
+  );
 }
 
-function getVideoURL(video: Video, embed: boolean): string {
-  switch (video.provider) {
-    case "youtube":
-      if (embed)
-        return `https://www.youtube.com/embed/${video.id}?autoplay=0&t=${video.startTime}`;
-      return `https://www.youtube.com/watch?v=${video.id}&t=${video.startTime}`;
-  }
+type ImageManagerPages = {
+  stored: {
+    onSubmit: (image: Image) => void;
+    page: number;
+  };
+  // stock: {
+  //   onSubmit: (image: Image) => void;
+  //   query: string;
+  //   provider: StockProvider;
+  //   page: number;
+  // };
+  upload: {
+    onSubmit: (image: Image) => void;
+  };
+};
+
+function ImageManagerContent(props: Parameters<typeof ImageManager>[0]) {
+  return (
+    <Modal title="Image Manager" width={720} height={720}>
+      <PaginateContainer<ImageManagerPages, "stored">
+        pages={{
+          stored: <ImageManagerStored />,
+          // stock: <ImageManagerStock />,
+          upload: <ImageManagerUpload />,
+        }}
+        defaultPage="stored"
+        defaultState={{
+          onSubmit: props.onSubmit,
+          page: 0,
+        }}
+        container={(Outlet, { currentPage, setPage, state }) => (
+          <div className="image-manager-container">
+            <nav>
+              <Button
+                onClick={() =>
+                  setPage("stored", { onSubmit: state.onSubmit, page: 0 })
+                }
+                className={concatClasses(
+                  currentPage === "stored" && "no-access"
+                )}
+              >
+                Saved Images
+              </Button>
+              {/* <Button
+                onClick={() =>
+                  setPage("stock", {
+                    onSubmit: state.onSubmit,
+                    page: 0,
+                    provider: "unsplash",
+                    query: "",
+                  })
+                }
+                className={concatClasses(
+                  currentPage === "stock" && "no-access"
+                )}
+              >
+                Stock Photos
+              </Button> */}
+              <Button
+                onClick={() => setPage("upload", { onSubmit: state.onSubmit })}
+                className={concatClasses(
+                  currentPage === "upload" && "no-access"
+                )}
+              >
+                Upload
+              </Button>
+            </nav>
+            <Outlet />
+          </div>
+        )}
+      />
+    </Modal>
+  );
 }
+const PAGE_SIZE = 12;
+function ImageManagerStored() {
+  const { state } = usePaginate<ImageManagerPages, "stored">();
+  const [page, setPage] = useState(0);
+  const [activeImage, setActiveImage] = useState<Image | null>(null);
+  const addAlert = useAddAlert();
+  const [endPage, setEndPage] = useState<number | null>(null);
+  const [dataLastUpdated, setDataLastUpdated] = useState(0);
+  const userInfo = useUserInfo();
+  // const [images, setImages] = useState<Array<Image>>();
+
+  const { data: images } = useSuspenseQuery({
+    queryKey: [
+      "public",
+      "user_image_uploads",
+      "author",
+      userInfo.id,
+      `page-${page}`,
+      `count-${PAGE_SIZE}`,
+      `last-updated-${dataLastUpdated}`,
+    ],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_image_uploads")
+        .select("*")
+        .eq("author", userInfo.id)
+        .order("created_at", { ascending: false })
+        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      if (page > 0 && (data === null || data.length === 0)) {
+        setPage(page - 1);
+        setEndPage(page - 1);
+      }
+      return { data: data ?? [], error };
+    },
+  }).data;
+  if (activeImage === null)
+    return (
+      <div className="image-list-container">
+        <div className="image-manager-image-list" key={`page-${page}`}>
+          {images.length === 0 ? (
+            <div className="image-upload-hint">
+              You don't have any saved images yet.&nbsp;
+              <a
+                href="./"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // dumb solution but it works
+                  const button = document.querySelector(
+                    ".image-manager-container>nav"
+                  )!.lastChild;
+                  (button as HTMLButtonElement).click();
+                }}
+              >
+                Upload one to get started!
+              </a>
+            </div>
+          ) : (
+            images.map((e, i) => {
+              const thisImage: Image = {
+                type: "upload",
+                path: {
+                  bucket: "user-image-uploads",
+                  path: e.media_path,
+                  fileName: e.file_name,
+                  id: e.id,
+                },
+              };
+
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setActiveImage(thisImage);
+                  }}
+                >
+                  <img src={getImageURL(thisImage)} />
+                </button>
+              );
+            })
+          )}
+        </div>
+        <div className="options">
+          {page > 0 && (
+            <ButtonIconWithTooltip
+              src="/icons/nav-arrow-right.svg"
+              imageProps={{ style: { transform: "rotate(180deg)" } }}
+              tooltip="Previous Page"
+              onClick={() => setPage(page - 1)}
+            />
+          )}
+          {(endPage === null || page < endPage) &&
+            images.length === PAGE_SIZE && (
+              <ButtonIconWithTooltip
+                src="/icons/nav-arrow-right.svg"
+                tooltip="Next Page"
+                onClick={() => setPage(page + 1)}
+              />
+            )}
+        </div>
+      </div>
+    );
+
+  return (
+    <form onSubmit={(e) => e.preventDefault()}>
+      <img src={getImageURL(activeImage)} className="upload-preview" />
+      <div className="options">
+        <ButtonIconWithTooltip
+          src="/icons/trash.svg"
+          tooltip="Delete"
+          onClick={() => {
+            addAlert((clear, replace) => (
+              <Confirm
+                title="Confirm Deletion"
+                onAction={async (action) => {
+                  if (action) {
+                    replace(
+                      <Modal title="Loading…">
+                        <Loader />
+                      </Modal>
+                    );
+                    const { error: removalError } = await supabase.storage
+                      .from(activeImage.path.bucket)
+                      .remove([
+                        `${activeImage.path.path.join("/")}/${
+                          activeImage.path.fileName
+                        }`,
+                      ]);
+                    if (removalError) {
+                      replace(
+                        <Modal title="Error">{removalError.message}</Modal>
+                      );
+                      return;
+                    }
+                    const { error } = await supabase.rpc("remove_loq_image", {
+                      upload_id: activeImage.path.id,
+                    });
+                    if (error) {
+                      replace(<Modal title="Error">{error.message}</Modal>);
+                      return;
+                    }
+
+                    clear();
+                    setDataLastUpdated(new Date().getTime());
+                    setActiveImage(null);
+                  }
+                }}
+              >
+                Are you sure you would like to delete{" "}
+                {activeImage.path.fileName}? It will be removed from all loqs
+                where it is used.
+              </Confirm>
+            ));
+          }}
+        />
+        <ButtonIconWithTooltip
+          src="/icons/xmark.svg"
+          tooltip="Cancel"
+          onClick={() => setActiveImage(null)}
+        />
+        <ButtonIconWithTooltip
+          src="/icons/check.svg"
+          tooltip="Select"
+          onClick={() => {
+            state.onSubmit(activeImage);
+          }}
+        />
+      </div>
+    </form>
+  );
+}
+
+function ImageManagerUpload() {
+  const [file, setFile] = useState<File | null>(null);
+  const { state } = usePaginate<ImageManagerPages, "upload">();
+  const addAlert = useAddAlert();
+  const alertHandler = useAlertHandler();
+  const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    const dragEnterListener: EventListener = (e) => {
+      e.preventDefault();
+      setDragging(true);
+    };
+    const dragLeaveListener: EventListener = (e) => {
+      e.preventDefault();
+      setDragging(false);
+    };
+    const dropListener: EventListener = async (e) => {
+      const event = e as DragEvent;
+      if (event.dataTransfer === null) return;
+      const data = event.dataTransfer.getData("URL");
+      if (data === "") {
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+          setDragging(false);
+          event.preventDefault();
+          onFileUpload(files[0]);
+        }
+        return;
+      }
+      // setDragging(false);
+      // event.preventDefault();
+      // console.log(data);
+      // const alert = addAlert(
+      //   <Modal title="Loading…">
+      //     <Loader />
+      //   </Modal>
+      // );
+      // const img = new Image();
+      // img.src = data;
+      // // Wait for image to load
+      // await new Promise<void>((res) => (img.onload = () => res()));
+      // img.crossOrigin
+      // const canvas = document.createElement("canvas");
+      // canvas.height = img.height;
+      // canvas.width = img.width;
+      // canvas.getContext("2d")?.drawImage(img, 0, 0);
+
+      // canvas.toBlob((blob) => {
+      //   if (blob === null) {
+      //     throw new Error("Blob is null!!");
+      //   }
+      //   alertHandler.removeAlert(alert.id);
+      //   onFileUpload(new File([blob], blob.type.replace("/", ".")));
+      // });
+    };
+
+    document.body.addEventListener("dragover", dragEnterListener);
+    document.body.addEventListener("dragleave", dragLeaveListener);
+    document.body.addEventListener("drop", dropListener);
+
+    return () => {
+      document.body.removeEventListener("dragover", dragEnterListener);
+      document.body.removeEventListener("dragleave", dragLeaveListener);
+      document.body.removeEventListener("drop", dropListener);
+    };
+  }, []);
+
+  function onFileUpload(file: File) {
+    if (!file.type.startsWith("image/")) {
+      return;
+    }
+
+    const MEGABYTE = 2 ** 20;
+    const MAX_FILE_SIZE = 4_194_304 - 65_536;
+
+    if (file.size >= MAX_FILE_SIZE) {
+      const options: Options = {
+        maxSizeMB: MAX_FILE_SIZE / MEGABYTE,
+        onProgress: (progress) => {
+          console.log("Compressing!", progress);
+        },
+      };
+
+      imageCompression(file, options).then((compressedImage) => {
+        setFile(compressedImage);
+      });
+    } else {
+      setFile(file);
+    }
+  }
+
+  if (file === null)
+    return (
+      <form>
+        <label
+          htmlFor="image-manager-upload"
+          className={concatClasses(dragging && "dragging")}
+        >
+          Click here or drag and drop to upload an image.
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          id="image-manager-upload"
+          onChange={(e) => {
+            const files = e.target.files;
+            if (files === null || files.length === 0) {
+              setFile(null);
+              return;
+            }
+            const file = files[0];
+
+            console.log(file);
+
+            onFileUpload(file);
+          }}
+        />
+      </form>
+    );
+
+  return (
+    <form onSubmit={(e) => e.preventDefault()}>
+      <img src={URL.createObjectURL(file)} className="upload-preview" />
+      <div className="options">
+        <ButtonIconWithTooltip
+          src="/icons/xmark.svg"
+          tooltip="Cancel"
+          onClick={() => setFile(null)}
+        />
+        <ButtonIconWithTooltip
+          src="/icons/check.svg"
+          tooltip="Upload"
+          onClick={async () => {
+            console.log("Upload clicked");
+            const alert = addAlert(
+              <Modal title="Uploading…">
+                <Loader />
+              </Modal>
+            );
+            const { data, error } = await supabase.rpc("upload_loq_image", {
+              user_file_name: file.name,
+            });
+            if (error) {
+              alertHandler.removeAlert(alert.id);
+              addAlert(
+                <Modal title="Error">
+                  An error occurred with code {error.code}: {error.message}
+                </Modal>
+              );
+              return;
+            }
+            const { media_path: mediaPath, id } = data as {
+              media_path: string[];
+              file_name: string;
+              id: number;
+            };
+            const { error: uploadError } = await supabase.storage
+              .from("user-image-uploads")
+              .upload(`${mediaPath.join("/")}/${file.name}`, file);
+
+            alertHandler.removeAlert(alert.id);
+            if (uploadError) {
+              await supabase.rpc("remove_loq_image", {
+                upload_id: id,
+              });
+              addAlert(
+                <Modal title="Error">
+                  An error occurred when uploading the image:{" "}
+                  {uploadError.message}
+                </Modal>
+              );
+              return;
+            }
+
+            state.onSubmit({
+              type: "upload",
+              path: {
+                bucket: "user-image-uploads",
+                path: mediaPath,
+                fileName: file.name,
+                id,
+              },
+            });
+          }}
+        />
+      </div>
+    </form>
+  );
+}
+
+// function ImageManagerStock() {
+//   const [activeImage, setActiveImage] = useState<Image | null>(null);
+//   const { state, updateState } = usePaginate<ImageManagerPages, "stock">();
+//   const [images, setImages] = useState<Image[] | null>(null);
+
+//   useEffect(() => {
+//     (async () => {
+//       if (state.query === "") {
+//         setImages(null);
+//         return;
+//       }
+//       const resp = await fetch(`https://unsplash.com/napi/search/photos?page=${state.page}&per_page=${PAGE_SIZE}&query=${encodeURIComponent(state.query)}`)
+//       const results = await resp.json();
+//     })()
+//   }, [state.query, state.page]);
+//   if (activeImage === null)
+//     return (
+//       <div className="image-list-container">
+//         {images && (
+//           <>
+//             <div className="image-manager-image-list">
+//               {images.map((e, i) => {
+//                 return (
+//                   <button
+//                     key={i}
+//                     onClick={() => {
+//                       setActiveImage(e);
+//                     }}
+//                   >
+//                     <img src={getImageURL(e)} />
+//                   </button>
+//                 );
+//               })}
+//             </div>
+//             <div className="options">
+//               <ButtonIconWithTooltip
+//                 src="/icons/nav-arrow-right.svg"
+//                 imageProps={{ style: { transform: "rotate(180deg)" } }}
+//                 tooltip="Previous Page"
+//                 onClick={() => updateState((state) => state.page--)}
+//               />
+//               <ButtonIconWithTooltip
+//                 src="/icons/nav-arrow-right.svg"
+//                 tooltip="Next Page"
+//                 onClick={() => updateState((state) => state.page++)}
+//               />
+//             </div>
+//           </>
+//         )}
+//       </div>
+//     );
+// }

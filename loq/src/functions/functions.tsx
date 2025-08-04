@@ -19,11 +19,9 @@ export function getRedirect(
   const redirect = new URLSearchParams(locationURL.search).get("redirect");
   if (!redirect) return defaultRedirect;
   let redirectURL = decodeURIComponent(redirect);
-  console.log("REDIRECT URL IS", redirectURL);
 
   while (redirectURL.startsWith("/")) redirectURL = redirectURL.substring(1);
 
-  console.log("REDIRECT URL IS", redirectURL);
   return `${locationURL.protocol}//${locationURL.host}/${redirectURL}`;
 }
 
@@ -138,13 +136,21 @@ export function blurActiveElement() {
     document.activeElement.blur();
 }
 
-export function splitArrayIntoChunks<T>(array: Array<T>, options: {
-  chunkSize: number
-} | {
-  chunkCount: number
-}) {
+export function splitArrayIntoChunks<T>(
+  array: Array<T>,
+  options:
+    | {
+        chunkSize: number;
+      }
+    | {
+        chunkCount: number;
+      }
+) {
   const splitArray: Array<Array<T>> = [];
-  const chunkSize = 'chunkSize' in options ? options.chunkSize : Math.ceil(array.length / options.chunkCount);
+  const chunkSize =
+    "chunkSize" in options
+      ? options.chunkSize
+      : Math.ceil(array.length / options.chunkCount);
   for (let i = 0; i < array.length; i += chunkSize) {
     const arrayChunk = [];
     for (let j = 0; j < chunkSize; j++) {
@@ -154,4 +160,99 @@ export function splitArrayIntoChunks<T>(array: Array<T>, options: {
     splitArray.push(arrayChunk);
   }
   return splitArray;
+}
+
+export function plural(
+  text: string,
+  count: number = 0,
+  suffix: string = "s",
+  singularSuffix: string = ""
+) {
+  if (count === 1) return text + singularSuffix;
+  return text + suffix;
+}
+
+export function timeout(ms: number) {
+  return new Promise<void>((res) => {
+    setTimeout(res, ms);
+  });
+}
+
+export function shuffle<T>(arr: Array<T>) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+export function testUnorderedArrayEquality<T extends number>(
+  arr1: Array<T>,
+  arr2: Array<T>
+) {
+  if (arr1.length !== arr2.length) return false;
+  arr1 = [...arr1];
+  arr2 = [...arr2];
+  arr1.sort((a, b) => a - b);
+  arr2.sort((a, b) => a - b);
+  return testOrderedArrayEquality(arr1, arr2);
+}
+
+export function testOrderedArrayEquality<T>(arr1: Array<T>, arr2: Array<T>) {
+  if (arr1.length !== arr2.length) return false;
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) return false;
+  }
+  return true;
+}
+
+export function replaceAll(
+  text: string,
+  search: RegExp | string,
+  replace: string
+): string {
+  if (typeof search === "string")
+    return text
+      .split(search)
+      .filter((e) => e.length > 0)
+      .join(replace);
+  else
+    return text
+      .split(search)
+      .filter((e) => e.length > 0 && !search.test(e))
+      .join(replace);
+}
+
+export function fadeAudioOut(element: HTMLAudioElement, ms: number) {
+  return new Promise<void>((res) => {
+    const startingVolume = element.volume;
+    const clear = setInterval(() => {
+      console.log("Running interval")
+      const newVolume = element.volume - startingVolume / 100;
+      console.log("New volume", newVolume);
+      if (newVolume > 0) element.volume = newVolume;
+      else {
+        element.volume = 0;
+        element.pause();
+        clearInterval(clear);
+        res();
+      }
+    }, ms / 100);
+  });
+}
+
+export function fadeAudioIn(element: HTMLAudioElement, ms: number) {
+  return new Promise<void>((res) => {
+    element.play();
+    const startingVolume = element.volume;
+    const clear = setInterval(() => {
+      const newVolume = element.volume + (1 - startingVolume) / 100;
+      if (newVolume < 1) element.volume = newVolume;
+      else {
+        element.volume = 1;
+        clearInterval(clear);
+        res();
+      }
+    }, ms / 100);
+  });
 }

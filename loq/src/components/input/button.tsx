@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEventHandler, ReactNode } from "react";
+import { ButtonHTMLAttributes, CSSProperties, DetailedHTMLProps, MouseEventHandler, ReactNode, Ref } from "react";
 import { ClassArray, RecursiveArray } from "../../functions/types";
 import { concatClasses } from "../../functions/functions";
 
@@ -9,10 +9,14 @@ export default function Button(props: {
   type?: "button" | "submit" | "reset";
   id?: string;
   color?: "default" | "dark";
-  style?: CSSProperties
+  style?: CSSProperties;
+  ref?: Ref<HTMLButtonElement>
+} & {
+  elementProps?: DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
 }) {
   return (
     <button
+      {...props.elementProps}
       type={props.type}
       id={props.id}
       className={concatClasses(
@@ -22,6 +26,7 @@ export default function Button(props: {
       )}
       onClick={props.onClick}
       style={props.style}
+      ref={props.ref}
     >
       {props.children}
     </button>

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { FullscreenLoader } from "../../components/load";
 import Layout from "../../components/page/layout";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -14,7 +14,6 @@ import {
   LinkIconWithTooltip,
 } from "../../components/tooltip";
 import { getImageURL } from "../../functions/database";
-import { Image } from "../editor/editor.types";
 import { Link } from "react-router-dom";
 
 export default function Saved() {
@@ -40,7 +39,7 @@ function SavedContent(props: { page: number; count: number }) {
     totalPages: null as null | number,
   });
   const user = useSuspenseLoggedInUserInfo();
-  const { data, error } = useSuspenseQuery({
+  const { data } = useSuspenseQuery({
     queryKey: [
       "public",
       "quizzes",
@@ -136,7 +135,7 @@ function SavedContent(props: { page: number; count: number }) {
                 </ElementWithTooltip>
               );
             case "thumbnail":
-              return <img src={getImageURL(data[row].thumbnail as Image)} />;
+              return <img onClick={e => {e.preventDefault();console.log(data[row])}} src={getImageURL(data[row].thumbnail ? JSON.parse(data[row].thumbnail as string) : null)} />;
           }
         }}
         getRowLink={(row) => `/view/${data[row].id}`}

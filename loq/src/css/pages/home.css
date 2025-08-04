@@ -1,0 +1,41 @@
+.main-logo {
+  width: 240px;
+  pointer-events: none;
+}
+
+.about-loq {
+  font-size: 24pt;
+  opacity: .9;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 48px;
+  max-width: 90%;
+}
+
+#content.home .header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--default-loq-background);
+  width: 100%;
+  margin-top: -80px;
+  padding-top: 80px;
+  z-index: -1;
+  margin-bottom: 32px;
+}
+
+#content.home .header > .transition {
+  flex: 0 0 128px;
+  background: linear-gradient(180deg, #00000000 0%, var(--main-background-color) 100%);
+  width: 100%;
+}
+
+.home-footer {
+  margin: 48px;
+}
+
+.home-footer a {
+    color: var(--section-border-3);
+    text-decoration: none;
+}

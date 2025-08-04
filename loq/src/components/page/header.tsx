@@ -19,7 +19,7 @@ export default function Header() {
         {userInfo.id === "" ? (
           <Link to="/login">Log In</Link>
         ) : (
-          <Link to="/account">{userInfo.displayName}</Link>
+          <Link to="/account">{userInfo.username}</Link>
         )}
       </div>
     </div>

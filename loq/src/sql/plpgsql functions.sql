@@ -166,3 +166,104 @@ BEGIN
 end;
 $$
 language plpgsql security definer;
+
+-- Upload loq image
+create
+or replace function upload_loq_image (user_file_name text) returns json
+set
+  search_path = '' as $$
+declare
+recent_count int;
+now_timestamp TIMESTAMP;
+upload_cutoff TIMESTAMP;
+user_media_path text[];
+media_id uuid;
+BEGIN
+if auth.role() != 'authenticated' then raise exception sqlstate '90100' using message = 'You must be signed in to upload an image!';
+end if;
+
+now_timestamp := NOW();
+upload_cutoff := now_timestamp - INTERVAL '10 minutes';
+SELECT COUNT(*) into recent_count
+FROM public.user_image_uploads
+WHERE user_image_uploads.created_at > upload_cutoff
+  and user_image_uploads.author = auth.uid();
+if recent_count >= 10 then RAISE EXCEPTION SQLSTATE '90101' using message = 'You have uploaded 10 images in the past 10 minutes. Please wait a few minutes before uploading another loq.';
+end if;
+
+media_id := gen_random_uuid();
+
+user_media_path := ARRAY['media', media_id::text];
+
+if length(user_file_name) > 64 or user_file_name ~ '/[^A-Za-z0-9\-\_\.]/' then
+raise exception sqlstate '90104' using message = 'Your file name does not meet the requirements.';
+end if;
+
+insert into public.user_image_uploads
+(
+  media_path,
+  file_name
+) values (
+  user_media_path,
+  user_file_name
+);
+
+return json_build_object(
+  'media_path', user_media_path,
+  'file_name', user_file_name
+);
+
+end;
+$$ language plpgsql security definer;
+
+-- Remove loq image
+create
+or replace function remove_loq_image (upload_id int8) returns void
+set
+  search_path = '' as $$
+BEGIN
+if auth.role() != 'authenticated' then raise exception sqlstate '90100' using message = 'You must be signed in to remove an image!';
+end if;
+
+if not exists (select 1 from public.user_image_uploads where id = upload_id and author = auth.uid())
+then
+  raise exception sqlstate '90105' using message = 'You cannot remove this image.';
+end if;
+
+delete from public.user_image_uploads where id = upload_id and author = auth.uid();
+end;
+$$ language plpgsql security definer;
+
+
+-- search public loqs
+CREATE
+or replace function search_public_quizzes (page_number int8, search_query_string text) returns int8[] set search_path = '' as $$
+declare
+match_ids int8[];
+BEGIN
+
+if search_query_string = '' then
+select array_agg(id) into match_ids from (
+  select id
+  from public.quizzes
+  where
+    visibility = 'public' order by last_updated desc
+  limit 10 offset page_number * 10
+) as sub;
+else
+select array_agg(id) into match_ids from (
+  select id
+  from public.quizzes
+  where
+    visibility = 'public' and
+    to_tsvector(title || ' ' || quiz_description) @@ to_tsquery(search_query_string)
+  order by last_updated desc
+  limit 10 offset page_number * 10
+) as sub;
+
+end if;
+  
+
+  return match_ids;
+end;
+$$ language plpgsql security invoker;

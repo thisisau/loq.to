@@ -1,0 +1,1 @@
+dockerSocketPath = "/var/run/docker.sock"

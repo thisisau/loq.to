@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Layout from "../components/page/layout";
 
 export default function NotFound() {
@@ -9,7 +10,7 @@ export default function NotFound() {
         be found.
       </p>
       <p>
-        <a href="/">Back to home</a>
+        <Link to="/">Back to home</Link>
       </p>
     </Layout>
   );

@@ -41,8 +41,8 @@
 .notification>.notification-body {
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
 
   margin: 8px;

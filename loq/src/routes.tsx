@@ -10,6 +10,7 @@ import "./css/components/notification.css";
 import "./css/components/display.css";
 import "./css/pages/saved.css";
 import "./css/pages/live.css";
+import "./css/pages/home.css";
 
 import {
   AlertHandler,
@@ -28,7 +29,8 @@ import Saved from "./pages/saved/saved";
 import Viewer from "./pages/saved/view";
 import Host from "./pages/game/host/host";
 import Play from "./pages/game/play/play";
-import Test from "./pages/test";
+import { Privacy, Terms } from "./pages/legal";
+import Explore from "./pages/explore/explore";
 
 function App() {
   const alertHandler = useRef(new AlertHandler());
@@ -49,7 +51,9 @@ function App() {
               <Route path="view/:id" element={<Viewer />} />
               <Route path="host/:id" element={<Host />} />
               <Route path="play" element={<Play />} />
-              <Route path="test" element={<Test />} />
+              <Route path="terms" element={<Terms />} />
+              <Route path="privacy" element={<Privacy />} />
+              <Route path="explore" element={<Explore />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

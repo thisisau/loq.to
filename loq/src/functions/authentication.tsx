@@ -24,7 +24,7 @@ export async function attemptAuthentication(
   setErrorContent: (content: ReactNode) => void
 ): Promise<BackendResponse<null>> {
   if (mode === "signup") {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: credentials.email,
       password: credentials.password,
     });
@@ -48,7 +48,7 @@ export async function attemptAuthentication(
       error: null,
     };
   } else {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: credentials.email,
       password: credentials.password,
     });

@@ -102,3 +102,21 @@ button.button-icon-container {
   margin-top: 16px;
   margin-bottom: 16px;
 }
+
+.faded-italic {
+  opacity: .6;
+  font-style: italic;
+}
+
+.legal {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap:16px;
+  align-content: center;
+  justify-content: center;
+}

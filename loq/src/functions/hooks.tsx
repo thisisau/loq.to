@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { asyncGetUserInfo, defaultInfo } from "./userInfo";
+import { useState } from "react";
+import { asyncGetUserInfo } from "./userInfo";
 
 export function useMutableState<T>(
   defaultValue: T
@@ -10,7 +9,7 @@ export function useMutableState<T>(
   function updateState(modificationCallback: (state: T) => void) {
     const duplicateState = structuredClone(state);
     modificationCallback(duplicateState);
-    setState(structuredClone(duplicateState));
+    setState(duplicateState);
   }
   return [state, updateState, setState];
 }

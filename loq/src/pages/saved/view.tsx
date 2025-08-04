@@ -3,10 +3,17 @@ import Layout from "../../components/page/layout";
 import { FullscreenLoader } from "../../components/load";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { fetchLOQ, fetchLOQContents } from "../../functions/database";
+import {
+  fetchLOQ,
+  getImageURL,
+  getVideoURL,
+} from "../../functions/database";
 import { Username } from "../../components/display/user";
 import { DualColumn } from "../../components/display/format";
-import { concatClasses, formatDate } from "../../functions/functions";
+import {
+  concatClasses,
+  formatDate,
+} from "../../functions/functions";
 import {
   ButtonIconWithTooltip,
   ElementWithTooltip,
@@ -60,7 +67,7 @@ function ViewerContent() {
   const loq = data.contents;
 
   // Workaround since the <title> tag doesn't work consistently
-  document.title = `${data.title} - loq.to`
+  document.title = `${data.title} - loq.to`;
 
   return (
     <>
@@ -77,6 +84,10 @@ function ViewerContent() {
         By <Username id={data?.author ?? "----"} />
       </span>
       <span>{loq.settings.description}</span>
+
+      {loq.settings.thumbnail && (
+        <img className="thumbnail" src={getImageURL(loq.settings.thumbnail)} />
+      )}
       {data.createdAt.getTime() === data.lastUpdated.getTime() ? (
         `Created at ${formatDate(data.createdAt, "long")}`
       ) : (
@@ -174,6 +185,7 @@ function ViewerContent() {
 }
 
 function LOQViewer(props: { contents: Contents }) {
+  const addAlert = useAddAlert();
   const loq = props.contents;
   const [shown, setShown] = useState<number | null>(null);
   return (
@@ -223,6 +235,19 @@ function LOQViewer(props: { contents: Contents }) {
                       {currentQuestion.description}
                     </div>
                   )}
+                  {currentQuestion.media &&
+                    (currentQuestion.media.type === "image" ? (
+                      <img
+                        className="media-image"
+                        src={getImageURL(currentQuestion.media.data)}
+                      />
+                    ) : (
+                      <div className="media-video-container">
+                        <iframe
+                          src={getVideoURL(currentQuestion.media.data, true)}
+                        />
+                      </div>
+                    ))}
                   <div className="details">
                     <div className="answers">
                       {currentQuestion.answers.map((answer, i) => (
@@ -243,6 +268,48 @@ function LOQViewer(props: { contents: Contents }) {
                             />
                           </div>
                           <span>{answer.text}</span>
+                          {"image" in answer && answer.image && (
+                            <div
+                              className="answer-image-container"
+                              tabIndex={0}
+                              onClick={() => {
+                                addAlert((clear) => (
+                                  <motion.div
+                                    className="modal"
+                                    initial={{
+                                      opacity: 0,
+                                    }}
+                                    animate={{
+                                      opacity: 1,
+                                      transition: {
+                                        duration: 0.2,
+                                        ease: "easeOut",
+                                      },
+                                    }}
+                                    onClick={clear}
+                                  >
+                                    <img
+                                      src={getImageURL(answer.image!)}
+                                      style={{
+                                        width: "80vw",
+                                        height: "80vh",
+                                        objectFit: "contain",
+                                      }}
+                                      onKeyDown={clear}
+                                      tabIndex={0}
+                                      onLoad={(e) =>
+                                        (e.target as HTMLImageElement).focus()
+                                      }
+                                    />
+                                  </motion.div>
+                                ));
+                              }}
+                            >
+                              <ElementWithTooltip tooltip="Click on this image to enlarge it.">
+                                <img src={getImageURL(answer.image)} />
+                              </ElementWithTooltip>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

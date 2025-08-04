@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import Header from "./header";
-import { concatClasses } from "../../functions/functions";
 
 export default function Layout(props: {
   hideHeader?: boolean;

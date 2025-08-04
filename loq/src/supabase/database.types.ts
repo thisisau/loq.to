@@ -41,7 +41,7 @@ export type Database = {
           game: string
           id: string
           payload: Json | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -49,7 +49,7 @@ export type Database = {
           game: string
           id?: string
           payload?: Json | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -57,7 +57,7 @@ export type Database = {
           game?: string
           id?: string
           payload?: Json | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -71,27 +71,29 @@ export type Database = {
       }
       live_games: {
         Row: {
-          contents: Json
           created_at: string
           host: string
           id: string
-          last_updated: string
         }
         Insert: {
-          contents: Json
           created_at?: string
           host?: string
-          id?: string
-          last_updated?: string
+          id: string
         }
         Update: {
-          contents?: Json
           created_at?: string
           host?: string
           id?: string
-          last_updated?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "live_games_host_fkey"
+            columns: ["host"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       live_rooms: {
         Row: {
@@ -110,7 +112,7 @@ export type Database = {
           {
             foreignKeyName: "live_rooms_id_fkey"
             columns: ["id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "live_games"
             referencedColumns: ["id"]
           },
@@ -139,45 +141,36 @@ export type Database = {
       }
       quizzes: {
         Row: {
-          author: string | null
-          contents: Json | null
+          author: string
+          contents: Json
           copy_protect: boolean
           created_at: string
           id: number
-          interactions: number
           last_updated: string
-          last_used: string
-          likes: number
           quiz_description: string
           thumbnail: Json | null
           title: string
           visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
-          author?: string | null
-          contents?: Json | null
-          copy_protect?: boolean
+          author: string
+          contents: Json
+          copy_protect: boolean
           created_at?: string
           id?: number
-          interactions?: number
           last_updated?: string
-          last_used?: string
-          likes?: number
           quiz_description?: string
           thumbnail?: Json | null
-          title?: string
+          title: string
           visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
-          author?: string | null
-          contents?: Json | null
+          author?: string
+          contents?: Json
           copy_protect?: boolean
           created_at?: string
           id?: number
-          interactions?: number
           last_updated?: string
-          last_used?: string
-          likes?: number
           quiz_description?: string
           thumbnail?: Json | null
           title?: string
@@ -186,6 +179,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "quizzes_author_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_image_uploads: {
+        Row: {
+          author: string
+          created_at: string
+          file_name: string
+          id: number
+          media_path: string[]
+        }
+        Insert: {
+          author?: string
+          created_at?: string
+          file_name: string
+          id?: number
+          media_path: string[]
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          file_name?: string
+          id?: number
+          media_path?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_image_uploads_author_fkey"
             columns: ["author"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -216,6 +241,12 @@ export type Database = {
         }
         Returns: Json
       }
+      is_hosting: {
+        Args: {
+          room_id: string
+        }
+        Returns: boolean
+      }
       live_create_room: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -237,6 +268,37 @@ export type Database = {
         }
         Returns: Json
       }
+      live_remove_room: {
+        Args: {
+          room_id: string
+        }
+        Returns: undefined
+      }
+      live_submit_answer: {
+        Args: {
+          submitter_user_id: string
+          room_id: string
+          answer_content: Json
+        }
+        Returns: undefined
+      }
+      remove_loq_image: {
+        Args: {
+          upload_id: number
+        }
+        Returns: undefined
+      }
+      search_public_quizzes: {
+        Args: {
+          page_number: number
+          search_query_string: string
+        }
+        Returns: number[]
+      }
+      stop_hosting: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       update_username: {
         Args: {
           new_username: string
@@ -249,6 +311,12 @@ export type Database = {
           loq_contents: Json
         }
         Returns: number
+      }
+      upload_loq_image: {
+        Args: {
+          user_file_name: string
+        }
+        Returns: Json
       }
       username_exists: {
         Args: {

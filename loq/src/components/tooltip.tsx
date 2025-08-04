@@ -10,6 +10,7 @@ import {
 import { Link, To } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import { concatClasses } from "../functions/functions";
+import Button from "./input/button";
 
 const tooltipStyle = {
   fontSize: "12pt",
@@ -85,6 +86,7 @@ export function ButtonIconWithTooltip(props: {
   >;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   "aria-label"?: string;
+  color? : Parameters<typeof Button>[0]["color"]
 }) {
   const [uuid] = useState(window.crypto.randomUUID());
   return (
@@ -96,6 +98,7 @@ export function ButtonIconWithTooltip(props: {
       draggable={props.draggable ?? false}
       aria-label={props["aria-label"] ?? props.tooltip}
       tabIndex={0}
+      color={props.color}
     >
       <img
         {...props.imageProps}

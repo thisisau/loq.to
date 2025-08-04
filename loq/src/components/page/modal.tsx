@@ -2,12 +2,13 @@ import { motion } from "motion/react";
 import { useClearAlert } from "../alerts/alert_hooks";
 import Button from "../input/button";
 import { Loader } from "../load";
+import { CSSProperties } from "react";
 
 export type ModalProps = {
   title: string;
   children: React.ReactNode;
   uncloseable?: boolean;
-  width?: number;
+  width?: CSSProperties["width"];
   flexibleHeight?: boolean;
   height?: number;
   dontGetTooBig?: boolean;
@@ -24,8 +25,8 @@ export function Modal(props: ModalProps) {
       <div
         className="modal-body shadow hide-scrollbar"
         style={{
-          width: `${props.width}px`,
-          maxWidth: `min(80%, ${props.width}px)`,
+          width: props.width,
+          maxWidth: typeof props.width === "number" ? `min(80%, ${props.width}px)` : "calc(100vw - 120px)",
           height: props.flexibleHeight
             ? "fit-content"
             : props.height
@@ -61,15 +62,19 @@ export function Modal(props: ModalProps) {
 
 export function LoaderModal() {
   return (
-    <motion.div className="modal" initial={{
-      opacity: 0
-    }} animate={{
-      opacity: 1,
-      transition: {
-        duration: .2,
-        ease: "easeOut"
-      }
-    }}>
+    <motion.div
+      className="modal"
+      initial={{
+        opacity: 0,
+      }}
+      animate={{
+        opacity: 1,
+        transition: {
+          duration: 0.2,
+          ease: "easeOut",
+        },
+      }}
+    >
       <Loader />
     </motion.div>
   );
@@ -77,7 +82,8 @@ export function LoaderModal() {
 
 export function Confirm(
   props: ModalProps & {
-    onAction?: (choice: boolean) => void;
+    onAction?: (choice: boolean, preventClose: () => void) => void;
+    canCancel?: boolean;
   }
 ) {
   const clearAlert = useClearAlert();
@@ -86,19 +92,29 @@ export function Confirm(
     <Modal {...props}>
       <div className="confirm-message">{props.children}</div>
       <div className="confirm-choices">
+        {props.canCancel !== false && (
+          <Button
+            onClick={async () => {
+              let shouldClear = true;
+              props.onAction &&
+                props.onAction(false, () => {
+                  shouldClear = false;
+                });
+              if (shouldClear) clearAlert();
+            }}
+            color="dark"
+          >
+            Cancel
+          </Button>
+        )}
         <Button
           onClick={async () => {
-            props.onAction && props.onAction(false);
-            clearAlert();
-          }}
-          color="dark"
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={async () => {
-            props.onAction && props.onAction(true);
-            clearAlert();
+            let shouldClear = true;
+            props.onAction &&
+              props.onAction(true, () => {
+                shouldClear = false;
+              });
+            if (shouldClear) clearAlert();
           }}
         >
           OK
