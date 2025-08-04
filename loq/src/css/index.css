@@ -1,5 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 :root {
-  --font: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font: "Noto Sans", Helvetica, Arial, sans-serif;
   font-family: var(--font);
   line-height: 1.5;
   font-weight: 400;
@@ -63,7 +64,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   flex-direction: column;
-  font-family: var(--main-font);
+  font-family: var(--font);
   color: var(--main-text-color);
 }
 
