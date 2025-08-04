@@ -470,7 +470,7 @@
 }
 
 .live .host-game.waiting>.loq-info.user-answers>div>div>.icon-container {
-  flex: 0 0 64px;
+  flex: 0 1 64px;
   height: 64px;
 }
 
@@ -484,6 +484,8 @@
   flex-grow: 1;
   display: flex;
   align-items: center;
+  flex-basis: auto;
+  min-height: auto;
 }
 
 .live .host-game.introduction .leaderboard-content {

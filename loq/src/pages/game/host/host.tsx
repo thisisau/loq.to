@@ -1008,7 +1008,7 @@ function Leaderboard() {
   if (game.game.status.mode !== "leaderboard")
     throw new Error("Leaderboard component should not be called at this time.");
   const topPlayers = structuredClone(game.users)
-    .sort((a, b) => a.points - b.points)
+    .sort((a, b) => b.points - a.points)
     .slice(0, 5);
   return (
     <>
