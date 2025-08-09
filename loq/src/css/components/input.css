@@ -1,5 +1,13 @@
 /* Text input */
 
+input {
+  font-family: var(--font);
+}
+
+input::placeholder {
+  color: var(--placeholder-text-color);
+}
+
 .text-input-component {
   padding: 12px;
   border-radius: 12px;

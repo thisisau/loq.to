@@ -26,13 +26,13 @@ export function Modal(props: ModalProps) {
         className="modal-body shadow hide-scrollbar"
         style={{
           width: props.width,
-          maxWidth: typeof props.width === "number" ? `min(80%, ${props.width}px)` : "calc(100vw - 120px)",
+          maxWidth: typeof props.width === "number" ? `min(80%, ${props.width}px)` : "calc(100vw - 12px)",
           height: props.flexibleHeight
             ? "fit-content"
             : props.height
             ? `${props.height}px`
             : undefined,
-          maxHeight: "fit-content",
+          // maxHeight: "fit-content",
         }}
         onClick={(e) => e.stopPropagation()}
       >

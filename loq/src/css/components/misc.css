@@ -108,9 +108,10 @@ button.button-icon-container {
   font-style: italic;
 }
 
-.legal {
+#content.legal {
   max-width: 640px;
   margin: 0 auto;
+  padding: 12px;
 }
 
 .list {

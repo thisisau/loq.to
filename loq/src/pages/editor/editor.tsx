@@ -298,6 +298,10 @@ function EditorSidebar() {
           draggable={false}
           onClick={async (e) => {
             if (user.id === "") {
+              if (page.unsavedChanges) {
+                e.preventDefault();
+                window.location.href = "/";
+              }
               return;
             }
             if (page.unsavedChanges) e.preventDefault();
@@ -982,7 +986,10 @@ function AnswerEditor() {
       {quiz.questions[currentQuestion].answers.map((currentAnswer, index) => {
         return (
           <div
-            className={concatClasses("answer section", "image" in currentAnswer && currentAnswer.image && "has-media")}
+            className={concatClasses(
+              "answer section",
+              "image" in currentAnswer && currentAnswer.image && "has-media"
+            )}
             style={{ backgroundColor: `var(--answer-${index % 12})` }}
             key={index}
           >
@@ -1565,20 +1572,22 @@ function ImageManagerStored() {
         <div className="image-manager-image-list" key={`page-${page}`}>
           {images.length === 0 ? (
             <div className="image-upload-hint">
-              You don't have any saved images yet.&nbsp;
-              <a
-                href="./"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // dumb solution but it works
-                  const button = document.querySelector(
-                    ".image-manager-container>nav"
-                  )!.lastChild;
-                  (button as HTMLButtonElement).click();
-                }}
-              >
-                Upload one to get started!
-              </a>
+              <span>
+                You don't have any saved images yet.&nbsp;
+                <a
+                  href="./"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // dumb solution but it works
+                    const button = document.querySelector(
+                      ".image-manager-container>nav"
+                    )!.lastChild;
+                    (button as HTMLButtonElement).click();
+                  }}
+                >
+                  Upload one to get started!
+                </a>
+              </span>
             </div>
           ) : (
             images.map((e, i) => {

@@ -28,6 +28,7 @@
 
 #content.viewer {
   gap: 8px;
+  padding: 12px;
 }
 
 #content.viewer .thumbnail,
@@ -67,7 +68,7 @@
 #content.viewer .questions-list {
   display: flex;
   flex-direction: column;
-  width: min(calc(100% - 24px), 720px);
+  width: min(100%, 720px);
   gap: 16px;
   margin-bottom: 96px;
 }
