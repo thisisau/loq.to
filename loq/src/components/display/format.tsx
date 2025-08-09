@@ -61,6 +61,7 @@ export function Card(
 
   // if (props.link) {
   return (
+    <div className="card-container">
     <Link
       className="card section"
       onMouseMove={(e) => {
@@ -95,15 +96,16 @@ export function Card(
       draggable={false}
       style={
         vars && {
-          transform: `skewX(${(vars.angle * vars.distance) / 50}rad) skewY(${
-            (vars.angle * vars.distance) / 50
-          }rad)`,
+          transform: `rotateX(${(vars.y -.5) / 6}rad) rotateY(${
+            (vars.x -.5) / -6
+          }rad) perspective(1px)`,
         }
       }
     >
       <div className="card-title">{props.title}</div>
       <div className="card-body">{props.children}</div>
     </Link>
+    </div>
   );
   // }
   // return (

@@ -44,11 +44,17 @@
 }
 
 .modal-head-content {
-  /* font-family: "Montserrat"; */
   font-size: 20pt;
   flex: 1 0;
   text-align: center;
   color: var(--text-on-gradient-color);
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 512px) {
+  .modal-head-close {
+    transform: translateX(10px) translateY(-16px);
+  }
 }
 
 .modal-head-close {

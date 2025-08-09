@@ -59,6 +59,7 @@
 .dual-column {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .dual-column > span {
@@ -74,8 +75,12 @@
   padding-left: 16px;
 }
 
+.card-container {
+  perspective: 1080px;
+}
+
 .card {
-  width: 360px;
+  width: min(360px, calc(100vw - 40px));
   height: 180px;
   padding: 0;
   display: flex;
