@@ -107,7 +107,7 @@ export function formatDate(
 
       // Date is same year as current time
       else if (now.getFullYear() === Y) {
-        return `${shortMonthKey[M]} ${d}`;
+        return `${shortMonthKey[M]} ${D}`;
       }
 
       // Default case
