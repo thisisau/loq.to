@@ -85,7 +85,7 @@ export default function onGameEvent(
   }
 }
 
-function answerIsCorrect(
+export function answerIsCorrect(
   currentQuestion: Question,
   answerPayload: { answer: string | Array<number> | number },
   answerOrder: Array<number>

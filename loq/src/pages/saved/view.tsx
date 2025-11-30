@@ -171,6 +171,13 @@ function ViewerContent() {
           tooltip="Play this loq"
           target="_blank"
         />
+        <LinkIconWithTooltip
+          className="button-icon-container"
+          src="/icons/open-book-beta.svg"
+          to={`/study/${data.id}`}
+          tooltip="Study this loq"
+          target="_blank"
+        />
       </div>
       <LOQViewer contents={loq} />
     </>
