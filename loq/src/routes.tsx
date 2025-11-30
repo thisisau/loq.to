@@ -31,6 +31,7 @@ import Host from "./pages/game/host/host";
 import Play from "./pages/game/play/play";
 import { Privacy, Terms } from "./pages/legal";
 import Explore from "./pages/explore/explore";
+import Study from "./pages/game/study/study";
 
 function App() {
   const alertHandler = useRef(new AlertHandler());
@@ -50,6 +51,7 @@ function App() {
               <Route path="saved" element={<Saved />} />
               <Route path="view/:id" element={<Viewer />} />
               <Route path="host/:id" element={<Host />} />
+              <Route path="study/:id" element={<Study />} />
               <Route path="play" element={<Play />} />
               <Route path="terms" element={<Terms />} />
               <Route path="privacy" element={<Privacy />} />

@@ -294,6 +294,22 @@
   justify-content: center;
 }
 
+.live.study>.footer {
+  flex-direction: row;
+}
+
+.live.study>.footer>:first-child {
+  flex-grow: 1;
+}
+
+.live.study .open-ended-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 0 1 384px;
+  margin: auto;
+}
+
 .live.host>.footer>div {
   font-size: 14pt;
 }
@@ -329,6 +345,10 @@
   grid-template-rows: 128px 48px 1fr 64px;
 }
 
+.live.study .host-game.waiting.question {
+  grid-template-columns: 144px 224px 1fr;
+}
+
 .live .host-game.waiting.question>.player-count {
   flex-direction: row;
   gap: 16px;
@@ -349,6 +369,10 @@
   font-size: 24pt;
   font-weight: bold;
   text-align: center;
+}
+
+.live.study .host-game.waiting.question.no-timer .title {
+  grid-column-start: 1;
 }
 
 .live .host-game.waiting.question>.answers {
