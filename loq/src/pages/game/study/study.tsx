@@ -319,7 +319,7 @@ function Preview() {
           };
         });
       }
-    }, 500);
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, []);
