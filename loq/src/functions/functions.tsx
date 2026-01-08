@@ -82,10 +82,14 @@ export function formatDate(
 
   const h = date.getHours();
   const m = date.getMinutes();
+  const mm = m.toString().padStart(2, "0");
   const s = date.getSeconds();
+  const ss = s.toString().padStart(2, "0");
   const d = date.getDay();
   const D = date.getDate();
+  const DD = D.toString().padStart(2, "0");
   const M = date.getMonth();
+  const MM = M.toString().padStart(2, "0");
   const Y = date.getFullYear();
   const now = new Date();
   const DAY_IN_MS = 1000 * 60 * 60 * 24;
@@ -93,37 +97,35 @@ export function formatDate(
 
   switch (mode) {
     case "short-adapt":
-      // Date is same day as current time
-      if (now.getDate() - DAY_IN_MS < date.getTime() && D === now.getDate()) {
-        return `${h % 12 === 0 ? 12 : h % 12}:${m
-          .toString()
-          .padStart(2, "0")} ${h / 12 < 1 ? "AM" : "PM"}`;
+      // Date is different year
+      if (now.getFullYear() !== Y) {
+        return `${Y}-${MM}-${DD}`;
       }
 
-      // Date is within 1 week of current time
-      else if (now.getTime() - WEEK_IN_MS < date.getTime()) {
-        return shortDayKey[d];
-      }
-
-      // Date is same year as current time
-      else if (now.getFullYear() === Y) {
+      // Date is different week
+      else if (now.getTime() - WEEK_IN_MS > date.getTime()) {
         return `${shortMonthKey[M]} ${D}`;
       }
 
-      // Default case
+      // Date is different day
+      else if (now.getDate() - DAY_IN_MS > date.getTime()) {
+        return shortDayKey[d];
+      }
+
+      // Default case: dates are same days
       else {
-        return `${Y}-${M}-${D}`;
+        return `${h % 12 === 0 ? 12 : h % 12}:${mm} ${
+          h / 12 < 1 ? "AM" : "PM"
+        }`;
       }
     case "long":
-      return `${longMonthKey[M]} ${D}, ${Y} at ${h % 12 === 0 ? 12 : h % 12}:${m
-        .toString()
-        .padStart(2, "0")} ${h / 12 < 1 ? "AM" : "PM"}`;
+      return `${longMonthKey[M]} ${D}, ${Y} at ${
+        h % 12 === 0 ? 12 : h % 12
+      }:${mm} ${h / 12 < 1 ? "AM" : "PM"}`;
     case "very-long":
       return `${longDayKey[d]}, ${longMonthKey[M]} ${D}, ${Y} at ${
         h % 12 === 0 ? 12 : h % 12
-      }:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")} ${
-        h / 12 < 1 ? "AM" : "PM"
-      }`;
+      }:${mm}:${ss}`;
   }
 }
 
@@ -227,7 +229,7 @@ export function fadeAudioOut(element: HTMLAudioElement, ms: number) {
   return new Promise<void>((res) => {
     const startingVolume = element.volume;
     const clear = setInterval(() => {
-      console.log("Running interval")
+      console.log("Running interval");
       const newVolume = element.volume - startingVolume / 100;
       console.log("New volume", newVolume);
       if (newVolume > 0) element.volume = newVolume;
