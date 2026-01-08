@@ -89,7 +89,7 @@ export function formatDate(
   const D = date.getDate();
   const DD = D.toString().padStart(2, "0");
   const M = date.getMonth();
-  const MM = M.toString().padStart(2, "0");
+  const MM = (M + 1).toString().padStart(2, "0");
   const Y = date.getFullYear();
   const now = new Date();
   const DAY_IN_MS = 1000 * 60 * 60 * 24;
