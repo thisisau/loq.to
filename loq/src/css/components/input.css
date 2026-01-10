@@ -38,6 +38,10 @@ textarea.text-input-component {
 
 /* Button input */
 
+button {
+  font-family: var(--font);
+}
+
 .button-component {
   padding: 12px;
   border: unset;
