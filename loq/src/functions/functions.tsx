@@ -108,7 +108,7 @@ export function formatDate(
       }
 
       // Date is different day
-      else if (now.getDate() - DAY_IN_MS > date.getTime()) {
+      else if (now.getTime() - DAY_IN_MS > date.getTime()) {
         return shortDayKey[d];
       }
 
